@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Blog Yönetimi</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            margin-top: 20px;
+        }
+        .blog-card {
+            transition: transform 0.2s;
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+        .preview-image {
+            max-height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body ng-controller="BlogAdminController as admin">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand text-dark" href="index.html">
+                <i class="bi bi-shield-lock-fill me-2"></i>Admin Panel - Blog Yönetimi
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="index.html">
+                            <i class="bi bi-images me-1"></i>Hero Slider
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="nutrition.html">
+                            <i class="bi bi-card-list me-1"></i>Beslenme Programları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active text-dark" href="blog.html">
+                            <i class="bi bi-journal-text me-1"></i>Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="gallery.html">
+                            <i class="bi bi-images me-1"></i>Galeri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="recipes.html">
+                            <i class="bi bi-journal-richtext me-1"></i>Lezzetli Tarifler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="appointments.html">
+                            <i class="bi bi-calendar-check me-1"></i>Randevu Talepleri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="../pages/index.html">
+                            <i class="bi bi-house me-1"></i>Ana Sayfaya Dön
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3">
+                    <i class="bi bi-journal-text me-2"></i>Blog Yönetimi
+                </h2>
+            </div>
+        </div>
+
+        <!-- Add New Post Button -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Blog Yazısı Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Blog Posts List -->
+        <div class="row" ng-if="admin.posts.length > 0">
+            <div class="col-md-6 col-lg-4 mb-4" ng-repeat="post in admin.posts track by post.id">
+                <div class="card blog-card h-100">
+                    <img ng-src="{{post.imageUrl || 'https://via.placeholder.com/400x200?text=Resim+Yok'}}" 
+                         class="card-img-top preview-image" 
+                         alt="{{post.title}}"
+                         onerror="this.src='https://via.placeholder.com/400x200?text=Resim+Yuklenemedi'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{post.title}}</h5>
+                        <p class="card-text text-muted small">{{post.excerpt || (post.content | limitTo: 100)}}{{post.content.length > 100 ? '...' : ''}}</p>
+                        <div class="mb-2">
+                            <span class="badge bg-info me-1"><i class="bi bi-person me-1"></i>{{post.author}}</span>
+                            <span class="badge bg-secondary me-1"><i class="bi bi-calendar me-1"></i>{{post.publishedDate | date:'dd.MM.yyyy'}}</span>
+                            <span class="badge" ng-class="post.isPublished ? 'bg-success' : 'bg-danger'">
+                                {{post.isPublished ? 'Yayında' : 'Taslak'}}
+                            </span>
+                            <span class="badge bg-primary me-1"><i class="bi bi-eye me-1"></i>{{post.viewCount}}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <button class="btn btn-sm btn-warning me-2" ng-click="admin.editPost(post)">
+                            <i class="bi bi-pencil"></i> Düzenle
+                        </button>
+                        <button class="btn btn-sm btn-danger" ng-click="admin.deletePost(post.id)">
+                            <i class="bi bi-trash"></i> Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="row" ng-if="admin.posts.length === 0 && !admin.loading">
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-journal-text" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Henüz blog yazısı eklenmemiş.</p>
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    İlk Yazıyı Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="row" ng-if="admin.loading">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="blogModal" tabindex="-1" aria-labelledby="blogModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blogModalLabel">
+                        {{admin.editingPost ? 'Blog Yazısı Düzenle' : 'Yeni Blog Yazısı Ekle'}}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="admin.savePost($event)">
+                        <div class="mb-3">
+                            <label for="blogTitle" class="form-label">Başlık *</label>
+                            <input type="text" class="form-control" id="blogTitle" ng-model="admin.currentPost.title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="blogAuthor" class="form-label">Yazar *</label>
+                            <input type="text" class="form-control" id="blogAuthor" ng-model="admin.currentPost.author" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="blogExcerpt" class="form-label">Özet (Kısa Açıklama)</label>
+                            <textarea class="form-control" id="blogExcerpt" rows="2" ng-model="admin.currentPost.excerpt" maxlength="500"></textarea>
+                            <small class="form-text text-muted">Maksimum 500 karakter. Blog listesinde görünecektir.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="blogContent" class="form-label">İçerik *</label>
+                            <textarea class="form-control" id="blogContent" rows="10" ng-model="admin.currentPost.content" required></textarea>
+                            <small class="form-text text-muted">Blog yazısının tam içeriği</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="blogImageFile" class="form-label">Görsel</label>
+                            <input type="file" class="form-control" id="blogImageFile" accept="image/*" 
+                                   ng-model="admin.imageFile" onchange="angular.element(this).scope().admin.onFileSelected(this)">
+                            <small class="form-text text-muted">Resim dosyası seçin (JPG, PNG, GIF - Max 5MB)</small>
+                            <div ng-if="admin.currentPost.imageUrl" class="mt-2">
+                                <img ng-src="{{admin.currentPost.imageUrl}}" alt="Önizleme" 
+                                     style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;" 
+                                     onerror="this.src='https://via.placeholder.com/200x150?text=Resim+Yuklenemedi'">
+                                <div class="mt-2">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           ng-model="admin.currentPost.imageUrl" 
+                                           placeholder="Veya manuel URL girin">
+                                </div>
+                            </div>
+                            <div ng-if="admin.uploading" class="mt-2">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <span class="ms-2">Yükleniyor...</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="blogPublishedDate" class="form-label">Yayın Tarihi</label>
+                                <input type="datetime-local" class="form-control" id="blogPublishedDate" ng-model="admin.currentPost.publishedDateFormatted">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Durum</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="blogIsPublished" ng-model="admin.currentPost.isPublished">
+                                    <label class="form-check-label" for="blogIsPublished">
+                                        Yayında
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin JS -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('BlogAdminController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.posts = [];
+            vm.loading = false;
+            vm.editingPost = false;
+            vm.currentPost = {};
+            vm.imageFile = null;
+            vm.uploading = false;
+            var blogModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load all blog posts
+            vm.loadPosts = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/BlogPost/All')
+                    .then(function(response) {
+                        vm.posts = response.data.map(function(post) {
+                            if (post.imageUrl) {
+                                post.imageUrl = vm.normalizeImageUrl(post.imageUrl);
+                            }
+                            if (post.publishedDate) {
+                                post.publishedDate = new Date(post.publishedDate);
+                            }
+                            return post;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading blog posts:', error);
+                        alert('Blog yazıları yüklenirken hata oluştu!');
+                        vm.loading = false;
+                    });
+            };
+            
+            // Initialize modal
+            vm.initModal = function() {
+                var modalElement = document.getElementById('blogModal');
+                if (modalElement && !blogModal) {
+                    blogModal = new bootstrap.Modal(modalElement);
+                }
+            };
+            
+            // File selected handler
+            vm.onFileSelected = function(input) {
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    vm.uploadImage(file);
+                }
+            };
+            
+            // Upload image
+            vm.uploadImage = function(file) {
+                vm.uploading = true;
+                var formData = new FormData();
+                formData.append('file', file);
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', apiBaseUrl + '/FileUpload/upload-image', true);
+                
+                xhr.onload = function() {
+                    vm.uploading = false;
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        vm.currentPost.imageUrl = response.imageUrl;
+                        $scope.$apply();
+                    } else {
+                        var error = JSON.parse(xhr.responseText);
+                        var errorMsg = error && error.message ? error.message : 'Resim yüklenirken hata oluştu!';
+                        alert('Hata: ' + errorMsg);
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    vm.uploading = false;
+                    $scope.$apply();
+                    alert('Resim yüklenirken bir hata oluştu!');
+                };
+                
+                xhr.send(formData);
+            };
+            
+            // Show add modal
+            vm.showAddModal = function() {
+                vm.editingPost = false;
+                var now = new Date();
+                var formattedDate = now.toISOString().slice(0, 16);
+                vm.currentPost = {
+                    title: '',
+                    author: '',
+                    excerpt: '',
+                    content: '',
+                    imageUrl: '',
+                    publishedDate: now,
+                    publishedDateFormatted: formattedDate,
+                    isPublished: true
+                };
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('blogImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (blogModal) {
+                    blogModal.show();
+                }
+            };
+            
+            // Edit post
+            vm.editPost = function(post) {
+                vm.editingPost = true;
+                vm.currentPost = angular.copy(post);
+                // Format date for datetime-local input
+                if (vm.currentPost.publishedDate) {
+                    var date = new Date(vm.currentPost.publishedDate);
+                    vm.currentPost.publishedDateFormatted = date.toISOString().slice(0, 16);
+                }
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('blogImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (blogModal) {
+                    blogModal.show();
+                }
+            };
+            
+            // Save post
+            vm.savePost = function($event) {
+                if ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                }
+                
+                if (!vm.currentPost.title || !vm.currentPost.content || !vm.currentPost.author) {
+                    alert('Lütfen başlık, içerik ve yazar alanlarını doldurun!');
+                    return false;
+                }
+                
+                // Convert formatted date to Date object
+                if (vm.currentPost.publishedDateFormatted) {
+                    vm.currentPost.publishedDate = new Date(vm.currentPost.publishedDateFormatted);
+                }
+                
+                if (vm.editingPost) {
+                    $http.put(apiBaseUrl + '/BlogPost/' + vm.currentPost.id, vm.currentPost)
+                        .then(function(response) {
+                            if (blogModal) {
+                                blogModal.hide();
+                            }
+                            vm.loadPosts();
+                            alert('Blog yazısı başarıyla güncellendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error updating blog post:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Blog yazısı güncellenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                } else {
+                    $http.post(apiBaseUrl + '/BlogPost', vm.currentPost)
+                        .then(function(response) {
+                            if (blogModal) {
+                                blogModal.hide();
+                            }
+                            vm.loadPosts();
+                            alert('Blog yazısı başarıyla eklendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error creating blog post:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Blog yazısı eklenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                }
+                return false;
+            };
+            
+            // Delete post
+            vm.deletePost = function(id) {
+                if (confirm('Bu blog yazısını silmek istediğinize emin misiniz?')) {
+                    $http.delete(apiBaseUrl + '/BlogPost/' + id)
+                        .then(function(response) {
+                            vm.loadPosts();
+                            alert('Blog yazısı başarıyla silindi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error deleting blog post:', error);
+                            alert('Blog yazısı silinirken hata oluştu!');
+                        });
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadPosts();
+                setTimeout(function() {
+                    vm.initModal();
+                }, 100);
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

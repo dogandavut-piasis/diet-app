@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lezzetli Tarifler - Diyetisyen</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .recipe-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .recipe-image {
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .recipe-card:hover .recipe-image {
+            transform: scale(1.1);
+        }
+        
+        .recipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .recipe-card:hover .recipe-overlay {
+            opacity: 1;
+        }
+        
+        .recipe-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .recipe-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .recipe-detail-content {
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        
+        .difficulty-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body ng-controller="RecipesController as recipes">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Diyetisyen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition-programs.html">Beslenme Programları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gallery.html">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="recipes.html">Lezzetli Tarifler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="appointment.html">Randevu Al</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#contact">İletişim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="../admin/index.html" title="Admin Panel">
+                            <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1 class="display-4 fw-bold mb-3">Lezzetli Tarifler</h1>
+                    <p class="lead">Sağlıklı ve lezzetli tariflerle mutfağınızı renklendirin</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipes Section -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Loading -->
+            <div class="row" ng-if="recipes.loading">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipes Grid -->
+            <div class="row g-4" ng-if="!recipes.loading && recipes.recipeList.length > 0">
+                <div class="col-md-6 col-lg-4" ng-repeat="recipe in recipes.recipeList track by recipe.id">
+                    <div class="card recipe-card h-100 shadow-sm" ng-click="recipes.openModal(recipe)">
+                        <div class="position-relative">
+                            <img ng-src="{{recipe.imageUrl || 'https://via.placeholder.com/400x250/4A90E2/FFFFFF?text=' + recipe.title}}" 
+                                 class="card-img-top recipe-image" 
+                                 alt="{{recipe.title}}"
+                                 onerror="this.src='https://via.placeholder.com/400x250?text=Resim+Yuklenemedi'">
+                            <div class="recipe-overlay"></div>
+                        </div>
+                        <div class="card-body recipe-content">
+                            <h5 class="card-title fw-bold mb-3">{{recipe.title}}</h5>
+                            <p class="card-text text-muted mb-3">
+                                {{recipe.excerpt || (recipe.description | limitTo: 150)}}{{recipe.description.length > 150 ? '...' : ''}}
+                            </p>
+                            <div class="recipe-meta mb-2">
+                                <span ng-if="recipe.prepTime" class="me-3">
+                                    <i class="bi bi-clock me-1"></i>{{recipe.prepTime}} dk
+                                </span>
+                                <span ng-if="recipe.cookTime" class="me-3">
+                                    <i class="bi bi-fire me-1"></i>{{recipe.cookTime}} dk
+                                </span>
+                                <span ng-if="recipe.servings" class="me-3">
+                                    <i class="bi bi-people me-1"></i>{{recipe.servings}} kişi
+                                </span>
+                                <span ng-if="recipe.difficulty" class="badge" 
+                                      ng-class="{'bg-success': recipe.difficulty === 'Kolay', 'bg-warning': recipe.difficulty === 'Orta', 'bg-danger': recipe.difficulty === 'Zor'}">
+                                    {{recipe.difficulty}}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center text-primary mt-3">
+                                <span>Tarifi Gör</span>
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="row" ng-if="!recipes.loading && recipes.recipeList.length === 0">
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-journal-richtext" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Henüz tarif eklenmemiş.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipe Detail Modal -->
+    <div class="modal fade" id="recipeDetailModal" tabindex="-1" aria-labelledby="recipeDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="recipeDetailModalLabel">
+                        <i class="bi bi-journal-richtext me-2"></i>{{recipes.selectedRecipe.title}}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Recipe Meta Info -->
+                    <div class="recipe-meta mb-3 pb-3 border-bottom d-flex flex-wrap gap-3">
+                        <span ng-if="recipes.selectedRecipe.prepTime">
+                            <i class="bi bi-clock me-1"></i><strong>Hazırlık:</strong> {{recipes.selectedRecipe.prepTime}} dk
+                        </span>
+                        <span ng-if="recipes.selectedRecipe.cookTime">
+                            <i class="bi bi-fire me-1"></i><strong>Pişirme:</strong> {{recipes.selectedRecipe.cookTime}} dk
+                        </span>
+                        <span ng-if="recipes.selectedRecipe.servings">
+                            <i class="bi bi-people me-1"></i><strong>Porsiyon:</strong> {{recipes.selectedRecipe.servings}} kişi
+                        </span>
+                        <span ng-if="recipes.selectedRecipe.difficulty" class="badge difficulty-badge" 
+                              ng-class="{'bg-success': recipes.selectedRecipe.difficulty === 'Kolay', 'bg-warning': recipes.selectedRecipe.difficulty === 'Orta', 'bg-danger': recipes.selectedRecipe.difficulty === 'Zor'}">
+                            {{recipes.selectedRecipe.difficulty}}
+                        </span>
+                    </div>
+                    
+                    <!-- Recipe Image -->
+                    <div ng-if="recipes.selectedRecipe.imageUrl" class="text-center mb-4">
+                        <img ng-src="{{recipes.selectedRecipe.imageUrl}}" 
+                             alt="{{recipes.selectedRecipe.title}}" 
+                             class="img-fluid rounded shadow"
+                             style="max-height: 400px; width: auto;"
+                             onerror="this.src='https://via.placeholder.com/600x300?text=Resim+Yuklenemedi'">
+                    </div>
+                    
+                    <!-- Recipe Description -->
+                    <div class="recipe-detail-content mb-4" ng-if="recipes.selectedRecipe.description">
+                        <h6 class="fw-bold mb-2">Açıklama:</h6>
+                        <p style="white-space: pre-wrap;">{{recipes.selectedRecipe.description}}</p>
+                    </div>
+                    
+                    <!-- Ingredients -->
+                    <div class="mb-4" ng-if="recipes.selectedRecipe.ingredients">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-list-check me-2 text-primary"></i>Malzemeler:</h6>
+                        <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{recipes.selectedRecipe.ingredients}}</div>
+                    </div>
+                    
+                    <!-- Instructions -->
+                    <div ng-if="recipes.selectedRecipe.instructions">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-list-ol me-2 text-primary"></i>Yapılışı:</h6>
+                        <div class="recipe-detail-content" style="white-space: pre-wrap;">{{recipes.selectedRecipe.instructions}}</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+                    <p class="mb-0">&copy; 2024 Diyetisyen. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <a href="https://www.instagram.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://www.twitter.com/" target="_blank" class="text-white" style="font-size: 1.5rem;">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('RecipesController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.recipeList = [];
+            vm.loading = false;
+            vm.selectedRecipe = {};
+            var recipeModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load recipes
+            vm.loadRecipes = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/Recipe')
+                    .then(function(response) {
+                        // Resim URL'lerini normalize et
+                        vm.recipeList = response.data.map(function(recipe) {
+                            if (recipe.imageUrl) {
+                                recipe.imageUrl = vm.normalizeImageUrl(recipe.imageUrl);
+                            }
+                            return recipe;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading recipes:', error);
+                        vm.loading = false;
+                    });
+            };
+            
+            // Open detail modal
+            vm.openModal = function(recipe) {
+                vm.selectedRecipe = angular.copy(recipe);
+                var modalElement = document.getElementById('recipeDetailModal');
+                if (modalElement) {
+                    recipeModal = new bootstrap.Modal(modalElement);
+                    recipeModal.show();
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadRecipes();
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randevu Talep Formu - Diyetisyen</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .appointment-form-section {
+            min-height: calc(100vh - 76px);
+            padding: 60px 0;
+        }
+        .appointment-form-card {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .form-select, .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-select:focus, .form-control:focus {
+            border-color: var(--primary-color, #4A90E2);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.15);
+        }
+        .btn-submit {
+            padding: 0.875rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body ng-controller="AppointmentController as appointment">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Diyetisyen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Ana Sayfa</a>
+                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition-programs.html">Beslenme Programları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gallery.html">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recipes.html">Lezzetli Tarifler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="appointment.html">Randevu Al</a>
+                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html#contact">İletişim</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-bold" href="../admin/index.html" title="Admin Panel">
+                        <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                    </a>
+                </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+
+    <!-- Appointment Form Section -->
+    <section class="appointment-form-section bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h1 class="display-4 fw-bold text-primary mb-3">Randevu Talep Formu</h1>
+                    <p class="lead text-muted">Size özel beslenme programı için randevu almak için formu doldurun</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card appointment-form-card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <form ng-submit="appointment.submitForm($event)">
+                                <div class="row">
+                                    <div class="col-md-12 mb-4">
+                                        <label for="fullName" class="form-label">
+                                            <i class="bi bi-person-fill text-primary me-2"></i>Adınız Soyadınız *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control form-control-lg" 
+                                               id="fullName" 
+                                               ng-model="appointment.formData.fullName"
+                                               placeholder="Adınız ve soyadınızı giriniz" 
+                                               required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="phone" class="form-label">
+                                            <i class="bi bi-telephone-fill text-primary me-2"></i>Telefon Numaranız *
+                                        </label>
+                                        <input type="tel" 
+                                               class="form-control form-control-lg" 
+                                               id="phone" 
+                                               ng-model="appointment.formData.phone"
+                                               placeholder="0555 123 45 67" 
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="email" class="form-label">
+                                            <i class="bi bi-envelope-fill text-primary me-2"></i>E-posta Adresiniz *
+                                        </label>
+                                        <input type="email" 
+                                               class="form-control form-control-lg" 
+                                               id="email" 
+                                               ng-model="appointment.formData.email"
+                                               placeholder="ornek@email.com" 
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="appointmentPreference" class="form-label">
+                                            <i class="bi bi-calendar-check text-primary me-2"></i>Randevu Tercihi *
+                                        </label>
+                                        <select class="form-select form-select-lg" 
+                                                id="appointmentPreference" 
+                                                ng-model="appointment.formData.appointmentPreference"
+                                                required>
+                                            <option value="" selected disabled>Seçiniz...</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Yüz yüze">Yüz yüze</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="goal" class="form-label">
+                                            <i class="bi bi-bullseye text-primary me-2"></i>Hedefiniz *
+                                        </label>
+                                        <select class="form-select form-select-lg" 
+                                                id="goal" 
+                                                ng-model="appointment.formData.goal"
+                                                required>
+                                            <option value="" selected disabled>Seçiniz...</option>
+                                            <option value="Kilo verme">Kilo verme</option>
+                                            <option value="Sağlıklı beslenme">Sağlıklı beslenme</option>
+                                            <option value="Sporcu diyeti">Sporcu diyeti</option>
+                                            <option value="Diğer">Diğer</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-4">
+                                        <label for="message" class="form-label">
+                                            <i class="bi bi-chat-left-text text-primary me-2"></i>Mesajınız
+                                        </label>
+                                        <textarea class="form-control form-control-lg" 
+                                                  id="message" 
+                                                  rows="5" 
+                                                  ng-model="appointment.formData.message"
+                                                  placeholder="Randevu talebinizle ilgili eklemek istediğiniz bilgiler (isteğe bağlı)"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 text-center mt-4">
+                                        <button type="submit" 
+                                                class="btn btn-primary btn-lg btn-submit" 
+                                                ng-disabled="appointment.submitting">
+                                            <span ng-if="!appointment.submitting">
+                                                <i class="bi bi-send-fill me-2"></i>Randevu Talebi Gönder
+                                            </span>
+                                            <span ng-if="appointment.submitting">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Gönderiliyor...
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+                    <p class="mb-0">&copy; 2024 Diyetisyen. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <a href="https://www.instagram.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://www.twitter.com/" target="_blank" class="text-white" style="font-size: 1.5rem;">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('AppointmentController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.formData = {
+                fullName: '',
+                phone: '',
+                email: '',
+                appointmentPreference: '',
+                goal: '',
+                message: ''
+            };
+            vm.submitting = false;
+            
+            // Submit form
+            vm.submitForm = function($event) {
+                if ($event) {
+                    $event.preventDefault();
+                }
+                
+                // Form validation
+                if (!vm.formData.fullName || !vm.formData.phone || !vm.formData.email || 
+                    !vm.formData.appointmentPreference || !vm.formData.goal) {
+                    alert('Lütfen tüm zorunlu alanları doldurun!');
+                    return false;
+                }
+                
+                vm.submitting = true;
+                
+                $http.post(apiBaseUrl + '/AppointmentRequest', vm.formData)
+                    .then(function(response) {
+                        vm.submitting = false;
+                        alert('Randevu talebiniz başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
+                        // Formu temizle
+                        vm.formData = {
+                            fullName: '',
+                            phone: '',
+                            email: '',
+                            appointmentPreference: '',
+                            goal: '',
+                            message: ''
+                        };
+                    })
+                    .catch(function(error) {
+                        console.error('Error submitting appointment:', error);
+                        vm.submitting = false;
+                        var errorMsg = error.data && error.data.message ? error.data.message : 'Randevu talebi gönderilirken hata oluştu!';
+                        alert('Hata: ' + errorMsg);
+                    });
+                
+                return false;
+            };
+        });
+    </script>
+</body>
+</html>

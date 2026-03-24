@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Giriş</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <i class="bi bi-shield-lock" style="font-size: 3rem; color: var(--primary-color, #2c6e49);"></i>
+            <h2 class="mt-3 fw-bold">Admin Paneli</h2>
+            <p class="text-muted">Yönetim paneline erişmek için giriş yapın</p>
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="mb-3">
+                <label for="username" class="form-label fw-medium">Kullanıcı Adı</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" placeholder="Kullanıcı adınızı girin" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label fw-medium">Şifre</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Şifrenizi girin" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary-custom w-100 py-2" id="loginBtn">
+                <span id="loginText">Giriş Yap</span>
+                <span id="loginSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="../pages/index.html" class="text-muted text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+
+            errorAlert.classList.add('d-none');
+            loginBtn.disabled = true;
+            loginText.textContent = 'Giriş yapılıyor...';
+            loginSpinner.classList.remove('d-none');
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(API_BASE_URL + '/Auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || data.detail || 'Kullanıcı adı veya şifre hatalı');
+                }
+
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('username', data.username);
+                window.location.href = 'index.html';
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Kullanıcı adı veya şifre hatalı';
+                errorAlert.classList.remove('d-none');
+            } finally {
+                loginBtn.disabled = false;
+                loginText.textContent = 'Giriş Yap';
+                loginSpinner.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
+</html>

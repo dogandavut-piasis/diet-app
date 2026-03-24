@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diyetisyen - Sağlıklı Yaşam Rehberi</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body ng-controller="HomeController as home">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Diyetisyen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition-programs.html">Beslenme Programları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gallery.html">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recipes.html">Lezzetli Tarifler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="appointment.html">Randevu Al</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact" ng-click="home.scrollTo('contact'); $event.preventDefault();">İletişim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="../admin/index.html" title="Admin Panel">
+                            <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Slider -->
+    <section id="home" class="hero-slider-section">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="false">
+            <div class="carousel-indicators hero-indicators" ng-if="home.slides.length > 1">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{$index}}" 
+                        ng-class="{'active': $index === 0}" 
+                        ng-repeat="slide in home.slides track by slide.id"
+                        aria-label="Slide {{$index + 1}}"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item" ng-class="{'active': $index === 0}" 
+                     ng-repeat="slide in home.slides track by slide.id"
+                     ng-style="{'background-image': 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%), url(' + slide.imageUrl + ')'}">
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-center">
+                            <div class="col-lg-10 col-xl-8 mx-auto text-center">
+                                <div class="hero-content">
+                                    <h1 class="display-4 display-md-3 fw-bold text-white mb-4 hero-title">
+                                        {{slide.title}}
+                                    </h1>
+                                    <p class="lead text-white-50 mb-5 hero-description" ng-if="slide.description">
+                                        {{slide.description}}
+                                    </p>
+                                    <div ng-if="slide.buttonText">
+                                        <a href="{{slide.buttonLink || '#!'}}" 
+                                           class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg hero-btn"
+                                           ng-click="!slide.buttonLink && home.scrollTo('contact')">
+                                            <span class="me-2">{{slide.buttonText}}</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev hero-nav-btn" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" ng-if="home.slides.length > 1">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Önceki</span>
+            </button>
+            <button class="carousel-control-next hero-nav-btn" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" ng-if="home.slides.length > 1">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Sonraki</span>
+            </button>
+        </div>
+        <div class="hero-scroll-indicator">
+            <a href="#about" ng-click="home.scrollTo('about')" class="text-white text-decoration-none">
+                <i class="bi bi-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Hakkımızda</h2>
+                    <p class="lead text-muted">Profesyonel ve güvenilir diyetisyen hizmetleri</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-award-fill text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center mb-3">Uzman Ekibimiz</h4>
+                            <p class="card-text text-muted text-center">
+                                Alanında uzman, deneyimli diyetisyenlerimizle size en uygun beslenme programlarını hazırlıyoruz. 
+                                Her bireyin metabolizması farklıdır ve biz bunun bilincindeyiz.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-heart-fill text-danger" style="font-size: 3rem;"></i>
+                            </div>
+                            <h4 class="card-title text-center mb-3">Kişiselleştirilmiş Programlar</h4>
+                            <p class="card-text text-muted text-center">
+                                Size özel hazırlanan diyet programları ile hedeflerinize ulaşmanızı sağlıyoruz. 
+                                Yaşam tarzınıza uygun, sürdürülebilir çözümler sunuyoruz.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Hizmetlerimiz</h2>
+                    <p class="lead text-muted">Size sunduğumuz profesyonel hizmetler</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-clipboard-data-fill text-success" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h5 class="card-title text-center mb-3">Kilo Yönetimi</h5>
+                            <p class="card-text text-muted text-center">
+                                Zayıflama veya kilo alma programları ile ideal kilonuza ulaşın.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-egg-fried text-warning" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h5 class="card-title text-center mb-3">Beslenme Danışmanlığı</h5>
+                            <p class="card-text text-muted text-center">
+                                Sağlıklı beslenme alışkanlıkları kazanmak için profesyonel danışmanlık.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-activity text-info" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h5 class="card-title text-center mb-3">Sporcu Beslenmesi</h5>
+                            <p class="card-text text-muted text-center">
+                                Performansınızı artırmak için özel sporcu beslenme programları.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BMI Calculator Section -->
+    <section id="bmi" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Vücut Kitle İndeksi Hesaplama</h2>
+                    <p class="lead text-muted">Vücut kitle indeksinizi öğrenin ve sağlıklı kilonuzu belirleyin</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-6">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-5">
+                            <form ng-submit="home.calculateBMI($event)">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="bmiHeight" class="form-label fw-semibold">
+                                            <i class="bi bi-rulers me-2 text-primary"></i>Boy (cm)
+                                        </label>
+                                        <input type="number" 
+                                               class="form-control form-control-lg" 
+                                               id="bmiHeight" 
+                                               ng-model="home.bmiData.height" 
+                                               placeholder="Örn: 170"
+                                               min="100"
+                                               max="250"
+                                               required>
+                                        <small class="text-muted">100-250 cm arası</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="bmiWeight" class="form-label fw-semibold">
+                                            <i class="bi bi-speedometer2 me-2 text-primary"></i>Kilo (kg)
+                                        </label>
+                                        <input type="number" 
+                                               class="form-control form-control-lg" 
+                                               id="bmiWeight" 
+                                               ng-model="home.bmiData.weight" 
+                                               placeholder="Örn: 70"
+                                               min="30"
+                                               max="300"
+                                               required>
+                                        <small class="text-muted">30-300 kg arası</small>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-pill">
+                                        <i class="bi bi-calculator me-2"></i>Hesapla
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- BMI Result -->
+                            <div ng-if="home.bmiResult" class="mt-5 pt-4 border-top">
+                                <div class="text-center mb-4">
+                                    <div class="bmi-circle mx-auto mb-3" ng-class="home.getBMIClass()">
+                                        <div class="bmi-value">{{home.bmiResult.bmi | number:1}}</div>
+                                        <div class="bmi-label">BMI</div>
+                                    </div>
+                                    <h4 class="fw-bold mb-2" ng-class="home.getBMIClassText()">
+                                        {{home.bmiResult.category}}
+                                    </h4>
+                                    <p class="text-muted mb-0">{{home.bmiResult.description}}</p>
+                                </div>
+
+                                <!-- BMI Scale -->
+                                <div class="bmi-scale mt-4">
+                                    <div class="scale-labels d-flex justify-content-between mb-2">
+                                        <small class="text-muted">Zayıf</small>
+                                        <small class="text-muted">Normal</small>
+                                        <small class="text-muted">Fazla Kilolu</small>
+                                        <small class="text-muted">Obez</small>
+                                    </div>
+                                    <div class="scale-bar">
+                                        <div class="scale-segment" style="background: #3498db; width: 18.5%"></div>
+                                        <div class="scale-segment" style="background: #2ecc71; width: 24.9%"></div>
+                                        <div class="scale-segment" style="background: #f39c12; width: 29.9%"></div>
+                                        <div class="scale-segment" style="background: #e74c3c; width: 26.7%"></div>
+                                        <div class="scale-indicator" ng-style="{'left': home.bmiResult.percentage + '%'}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Ideal Weight Range -->
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">İdeal Kilo Aralığı</small>
+                                            <strong class="text-primary">{{home.bmiResult.idealMin | number:1}} - {{home.bmiResult.idealMax | number:1}} kg</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Fark</small>
+                                            <strong ng-class="{'text-danger': home.bmiResult.difference > 0, 'text-success': home.bmiResult.difference <= 0}">
+                                                {{home.bmiResult.difference > 0 ? '+' : ''}}{{home.bmiResult.difference | number:1}} kg
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Blog Posts Section -->
+    <section id="blog-posts" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Yazılarım</h2>
+                    <p class="lead text-muted">Sağlıklı beslenme ve diyet hakkında son yazılarımız</p>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Loading -->
+                <div class="col-12 text-center" ng-if="home.loadingBlog">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                
+                <!-- Blog Posts -->
+                <div class="col-md-6 col-lg-4 mb-4" ng-repeat="post in home.latestBlogPosts track by post.id" ng-if="!home.loadingBlog">
+                    <div class="card h-100 shadow-sm border-0 blog-card-home">
+                        <div class="position-relative" style="height: 200px; overflow: hidden;">
+                            <img ng-src="{{post.imageUrl || 'https://via.placeholder.com/400x250/4A90E2/FFFFFF?text=' + post.title}}" 
+                                 class="card-img-top" 
+                                 alt="{{post.title}}"
+                                 style="height: 100%; object-fit: cover; transition: transform 0.5s ease;"
+                                 onerror="this.src='https://via.placeholder.com/400x250?text=Resim+Yuklenemedi'"
+                                 onmouseover="this.style.transform='scale(1.1)'"
+                                 onmouseout="this.style.transform='scale(1)'">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3">{{post.title}}</h5>
+                            <p class="card-text text-muted small mb-3">
+                                {{post.excerpt || (post.content | limitTo: 100)}}{{post.content.length > 100 ? '...' : ''}}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>{{post.publishedDate | date:'dd.MM.yyyy'}}
+                                </small>
+                                <a href="blog.html" class="btn btn-sm btn-outline-primary">
+                                    Devamını Oku <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="col-12 text-center py-4" ng-if="!home.loadingBlog && home.latestBlogPosts.length === 0">
+                    <p class="text-muted">Henüz blog yazısı eklenmemiş.</p>
+                    <a href="blog.html" class="btn btn-primary mt-2">Blog Sayfasına Git</a>
+                </div>
+            </div>
+            <div class="row mt-4" ng-if="!home.loadingBlog && home.latestBlogPosts.length > 0">
+                <div class="col-12 text-center">
+                    <a href="blog.html" class="btn btn-outline-primary btn-lg">
+                        Tüm Yazıları Gör <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Gallery Images Section -->
+    <section id="gallery-preview" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Galerimiz</h2>
+                    <p class="lead text-muted">Beslenme programlarımız ve çalışmalarımızdan örnekler</p>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Loading -->
+                <div class="col-12 text-center" ng-if="home.loadingGallery">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                
+                <!-- Gallery Images -->
+                <div class="col-md-4 mb-4" ng-repeat="image in home.latestGalleryImages track by image.id" ng-if="!home.loadingGallery">
+                    <div class="card h-100 shadow-sm border-0 gallery-card-home" ng-click="home.goToGallery()" style="cursor: pointer;">
+                        <div class="position-relative gallery-image-container" style="height: 250px; overflow: hidden; background-color: #f5f5f5;">
+                            <img ng-src="{{image.imageUrl}}" 
+                                 class="card-img-top gallery-home-image" 
+                                 alt="{{image.title}}"
+                                 style="height: 100%; width: 100%; object-fit: cover; transition: transform 0.5s ease;"
+                                 onerror="this.src='https://via.placeholder.com/400x300?text=Resim+Yuklenemedi'; this.onerror=null;"
+                                 ng-if="image.imageUrl">
+                            <div ng-if="!image.imageUrl" style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                                <span style="color: #6c757d;">{{image.title}}</span>
+                            </div>
+                            <div class="gallery-overlay-dark" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); transition: background 0.3s ease; pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-2">{{image.title}}</h5>
+                            <p class="card-text text-muted small mb-0" ng-if="image.description">
+                                {{image.description | limitTo: 80}}{{image.description.length > 80 ? '...' : ''}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="col-12 text-center py-4" ng-if="!home.loadingGallery && home.latestGalleryImages.length === 0">
+                    <p class="text-muted">Henüz galeri resmi eklenmemiş.</p>
+                    <a href="gallery.html" class="btn btn-primary mt-2">Galeri Sayfasına Git</a>
+                </div>
+            </div>
+            <div class="row mt-4" ng-if="!home.loadingGallery && home.latestGalleryImages.length > 0">
+                <div class="col-12 text-center">
+                    <a href="gallery.html" class="btn btn-outline-primary btn-lg">
+                        Tüm Galeriyi Gör <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Recipes Section -->
+    <section id="recipes-preview" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Lezzetli Tarifler</h2>
+                    <p class="lead text-muted">Sağlıklı ve lezzetli tariflerle mutfağınızı renklendirin</p>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Loading -->
+                <div class="col-12 text-center" ng-if="home.loadingRecipes">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                
+                <!-- Recipes -->
+                <div class="col-md-4 mb-4" ng-repeat="recipe in home.latestRecipes track by recipe.id" ng-if="!home.loadingRecipes">
+                    <div class="card h-100 shadow-sm border-0 recipe-card-home" ng-click="home.goToRecipes()" style="cursor: pointer;">
+                        <div class="position-relative recipe-image-container" style="height: 250px; overflow: hidden; background-color: #f5f5f5;">
+                            <img ng-src="{{recipe.imageUrl}}" 
+                                 class="card-img-top recipe-home-image" 
+                                 alt="{{recipe.title}}"
+                                 style="height: 100%; width: 100%; object-fit: cover; transition: transform 0.5s ease;"
+                                 onerror="this.src='https://via.placeholder.com/400x300?text=Resim+Yuklenemedi'; this.onerror=null;"
+                                 ng-if="recipe.imageUrl">
+                            <div ng-if="!recipe.imageUrl" style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                                <span style="color: #6c757d;">{{recipe.title}}</span>
+                            </div>
+                            <div class="recipe-overlay-dark" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0); transition: background 0.3s ease; pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-2">{{recipe.title}}</h5>
+                            <p class="card-text text-muted small mb-2">
+                                {{recipe.excerpt || (recipe.description | limitTo: 80)}}{{recipe.description.length > 80 ? '...' : ''}}
+                            </p>
+                            <div class="recipe-meta-small d-flex flex-wrap gap-2">
+                                <span ng-if="recipe.prepTime" class="badge bg-secondary">
+                                    <i class="bi bi-clock me-1"></i>{{recipe.prepTime}} dk
+                                </span>
+                                <span ng-if="recipe.servings" class="badge bg-secondary">
+                                    <i class="bi bi-people me-1"></i>{{recipe.servings}} kişi
+                                </span>
+                                <span ng-if="recipe.difficulty" class="badge" 
+                                      ng-class="{'bg-success': recipe.difficulty === 'Kolay', 'bg-warning': recipe.difficulty === 'Orta', 'bg-danger': recipe.difficulty === 'Zor'}">
+                                    {{recipe.difficulty}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="col-12 text-center py-4" ng-if="!home.loadingRecipes && home.latestRecipes.length === 0">
+                    <p class="text-muted">Henüz tarif eklenmemiş.</p>
+                    <a href="recipes.html" class="btn btn-primary mt-2">Tarifler Sayfasına Git</a>
+                </div>
+            </div>
+            <div class="row mt-4" ng-if="!home.loadingRecipes && home.latestRecipes.length > 0">
+                <div class="col-12 text-center">
+                    <a href="recipes.html" class="btn btn-outline-primary btn-lg">
+                        Tüm Tarifleri Gör <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Section -->
+    <section id="instagram" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Instagram'da Takip Edin</h2>
+                    <p class="lead text-muted">Güncel içeriklerimiz ve sağlıklı tarifler için bizi takip edin</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <!-- Instagram Feed Embed -->
+                        <div class="card text-center shadow-sm" style="max-width: 400px; margin: 0 auto; border-radius: 12px;">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-instagram text-danger" style="font-size: 3rem;"></i>
+                                </div>
+                                
+                                <h5 class="card-title fw-bold">@hamz_taskin</h5>
+                                <p class="card-text text-muted">Güncel paylaşımlarımızı görmek için Instagram'da bizi takip edin.</p>
+                                
+                                <a href="https://www.instagram.com/dyt.rabiaozkan/" 
+                                   target="_blank" 
+                                   class="btn btn-primary px-4 py-2" 
+                                   style="background: #E1306C; border: none;"> <i class="bi bi-instagram me-2"></i> Profili Görüntüle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Appointment Request Section -->
+    <section id="appointment" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Randevu Al</h2>
+                    <p class="lead text-muted">Size özel beslenme programı için randevu almak için formu doldurun</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4 p-md-5">
+                            <form ng-submit="home.submitAppointmentForm($event)">
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="appointmentFullName" class="form-label">
+                                            <i class="bi bi-person-fill text-primary me-2"></i>Adınız Soyadınız *
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="appointmentFullName" 
+                                               ng-model="home.appointmentData.fullName"
+                                               placeholder="Adınız ve soyadınızı giriniz" 
+                                               required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointmentPhone" class="form-label">
+                                            <i class="bi bi-telephone-fill text-primary me-2"></i>Telefon Numaranız *
+                                        </label>
+                                        <input type="tel" 
+                                               class="form-control" 
+                                               id="appointmentPhone" 
+                                               ng-model="home.appointmentData.phone"
+                                               placeholder="0555 123 45 67" 
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointmentEmail" class="form-label">
+                                            <i class="bi bi-envelope-fill text-primary me-2"></i>E-posta Adresiniz *
+                                        </label>
+                                        <input type="email" 
+                                               class="form-control" 
+                                               id="appointmentEmail" 
+                                               ng-model="home.appointmentData.email"
+                                               placeholder="ornek@email.com" 
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointmentPreferenceHome" class="form-label">
+                                            <i class="bi bi-calendar-check text-primary me-2"></i>Randevu Tercihi *
+                                        </label>
+                                        <select class="form-select" 
+                                                id="appointmentPreferenceHome" 
+                                                ng-model="home.appointmentData.appointmentPreference"
+                                                required>
+                                            <option value="" selected disabled>Seçiniz...</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Yüz yüze">Yüz yüze</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="appointmentGoalHome" class="form-label">
+                                            <i class="bi bi-bullseye text-primary me-2"></i>Hedefiniz *
+                                        </label>
+                                        <select class="form-select" 
+                                                id="appointmentGoalHome" 
+                                                ng-model="home.appointmentData.goal"
+                                                required>
+                                            <option value="" selected disabled>Seçiniz...</option>
+                                            <option value="Kilo verme">Kilo verme</option>
+                                            <option value="Sağlıklı beslenme">Sağlıklı beslenme</option>
+                                            <option value="Sporcu diyeti">Sporcu diyeti</option>
+                                            <option value="Diğer">Diğer</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="appointmentMessageHome" class="form-label">
+                                            <i class="bi bi-chat-left-text text-primary me-2"></i>Mesajınız
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="appointmentMessageHome" 
+                                                  rows="4" 
+                                                  ng-model="home.appointmentData.message"
+                                                  placeholder="Randevu talebinizle ilgili eklemek istediğiniz bilgiler (isteğe bağlı)"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 text-center mt-3">
+                                        <button type="submit" 
+                                                class="btn btn-primary btn-lg px-5" 
+                                                ng-disabled="home.submittingAppointment">
+                                            <span ng-if="!home.submittingAppointment">
+                                                <i class="bi bi-send-fill me-2"></i>Randevu Talebi Gönder
+                                            </span>
+                                            <span ng-if="home.submittingAppointment">
+                                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Gönderiliyor...
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">İletişim</h2>
+                    <p class="lead text-muted">Randevu almak veya sorularınız için bize ulaşın</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-6 mb-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4">
+                                <i class="bi bi-geo-alt-fill text-primary me-2"></i>Adres
+                            </h5>
+                            <p class="text-muted">Örnek Mahalle, Örnek Sokak No:123<br>İstanbul, Türkiye</p>
+                            <hr>
+                            <h5 class="card-title mb-4">
+                                <i class="bi bi-telephone-fill text-primary me-2"></i>Telefon
+                            </h5>
+                            <p class="text-muted">+90 (212) 555 0123</p>
+                            <hr>
+                            <h5 class="card-title mb-4">
+                                <i class="bi bi-envelope-fill text-primary me-2"></i>E-posta
+                            </h5>
+                            <p class="text-muted">info@diyetisyen.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+                    <p class="mb-0">&copy; 2024 Diyetisyen. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <a href="https://www.instagram.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://www.twitter.com/" target="_blank" class="text-white" style="font-size: 1.5rem;">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../js/app.js"></script>
+</body>
+</html>

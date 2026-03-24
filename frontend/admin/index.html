@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Slider Yönetimi - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+  <script src="../js/config.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/app.js"></script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <h4 class="mb-0 fw-bold">Admin Panel</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="index.html"><i class="bi bi-images me-2"></i>Hero Slider</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="nutrition.html"><i class="bi bi-heart-pulse me-2"></i>Beslenme</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="blog.html"><i class="bi bi-journal-richtext me-2"></i>Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="gallery.html"><i class="bi bi-card-image me-2"></i>Galeri</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="recipes.html"><i class="bi bi-egg-fried me-2"></i>Tarifler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="appointments.html"><i class="bi bi-calendar-check me-2"></i>Randevular</a>
+                </li>
+                <li><hr class="dropdown-divider mx-3"></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/index.html"><i class="bi bi-house me-2"></i>Ana Sayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="#" onclick="adminLogout()"><i class="bi bi-box-arrow-right me-2"></i>Çıkış</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Hero Slider Yönetimi</h2>
+                    <p class="text-muted mb-0">Ana sayfa slider görsellerini yönetin</p>
+                </div>
+                <button class="btn btn-primary-custom" onclick="openAddModal()">
+                    <i class="bi bi-plus-lg me-2"></i>Yeni Slide Ekle
+                </button>
+            </div>
+
+            <div id="slidesList" class="row g-4 mt-2">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Yükleniyor...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="slideModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Yeni Slide Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="slideForm">
+                        <input type="hidden" id="slideId">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-medium">Başlık</label>
+                                <input type="text" class="form-control" id="slideTitle" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Sıra</label>
+                                <input type="number" class="form-control" id="slideOrder" value="0">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Açıklama</label>
+                                <textarea class="form-control" id="slideDescription" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Buton Metni</label>
+                                <input type="text" class="form-control" id="slideButtonText">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Buton Linki</label>
+                                <input type="text" class="form-control" id="slideButtonLink">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-medium">Görsel</label>
+                                <input type="file" class="form-control" id="slideImage" accept="image/*">
+                                <div id="currentImage" class="mt-2 d-none">
+                                    <small class="text-muted">Mevcut görsel:</small>
+                                    <img id="currentImagePreview" src="" class="d-block mt-1 rounded" style="max-height: 100px;" onerror="imgError(this)">
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="slideIsActive" checked>
+                                    <label class="form-check-label fw-medium" for="slideIsActive">Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary-custom" onclick="saveSlide()">
+                        <i class="bi bi-check-lg me-1"></i>Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let slideModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            slideModal = new bootstrap.Modal(document.getElementById('slideModal'));
+            loadSlides();
+        });
+
+        async function loadSlides() {
+            try {
+                const slides = await api('/HeroSlide/All');
+                const container = document.getElementById('slidesList');
+
+                if (!slides || slides.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-images" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="mt-2 text-muted">Henüz slide eklenmemiş</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = slides.map(slide => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card-modern h-100">
+                            <div class="position-relative">
+                                <img src="${imgUrl(slide.imageUrl || slide.imagePath)}"
+                                     class="card-img-top"
+                                     style="height: 200px; object-fit: cover;"
+                                     alt="${slide.title}"
+                                     onerror="imgError(this)">
+                                <span class="badge ${slide.isActive ? 'bg-success' : 'bg-secondary'} position-absolute top-0 end-0 m-2">
+                                    ${slide.isActive ? 'Aktif' : 'Pasif'}
+                                </span>
+                                <span class="badge bg-dark position-absolute top-0 start-0 m-2">
+                                    Sıra: ${slide.order ?? 0}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">${slide.title}</h5>
+                                <p class="card-text text-muted small">${slide.description || ''}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3 px-3">
+                                <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editSlide(${slide.id})">
+                                    <i class="bi bi-pencil me-1"></i>Düzenle
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteSlide(${slide.id})">
+                                    <i class="bi bi-trash me-1"></i>Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('slidesList').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Veriler yüklenirken hata oluştu.</div>
+                    </div>`;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Yeni Slide Ekle';
+            document.getElementById('slideForm').reset();
+            document.getElementById('slideId').value = '';
+            document.getElementById('slideIsActive').checked = true;
+            document.getElementById('currentImage').classList.add('d-none');
+            slideModal.show();
+        }
+
+        async function editSlide(id) {
+            try {
+                const slide = await api('/HeroSlide/' + id);
+                document.getElementById('modalTitle').textContent = 'Slide Düzenle';
+                document.getElementById('slideId').value = slide.id;
+                document.getElementById('slideTitle').value = slide.title || '';
+                document.getElementById('slideDescription').value = slide.description || '';
+                document.getElementById('slideButtonText').value = slide.buttonText || '';
+                document.getElementById('slideButtonLink').value = slide.buttonLink || '';
+                document.getElementById('slideOrder').value = slide.order ?? 0;
+                document.getElementById('slideIsActive').checked = slide.isActive;
+                document.getElementById('slideImage').value = '';
+
+                if (slide.imageUrl || slide.imagePath) {
+                    document.getElementById('currentImage').classList.remove('d-none');
+                    document.getElementById('currentImagePreview').src = imgUrl(slide.imageUrl || slide.imagePath);
+                } else {
+                    document.getElementById('currentImage').classList.add('d-none');
+                }
+
+                slideModal.show();
+            } catch (error) {
+                alert('Slide bilgileri yüklenirken hata oluştu.');
+            }
+        }
+
+        async function saveSlide() {
+            var id = document.getElementById('slideId').value;
+            var imageUrlValue = '';
+
+            // Resim secildiyse once yukle
+            var imageFile = document.getElementById('slideImage').files[0];
+            if (imageFile) {
+                try {
+                    var uploadResult = await apiUpload(imageFile);
+                    imageUrlValue = uploadResult.imageUrl;
+                } catch (e) {
+                    alert('Resim yüklenirken hata oluştu!');
+                    return;
+                }
+            }
+
+            var data = {
+                title: document.getElementById('slideTitle').value,
+                description: document.getElementById('slideDescription').value,
+                buttonText: document.getElementById('slideButtonText').value,
+                buttonLink: document.getElementById('slideButtonLink').value,
+                order: parseInt(document.getElementById('slideOrder').value) || 0,
+                isActive: document.getElementById('slideIsActive').checked
+            };
+
+            // Yeni resim yuklendiyse ekle, yoksa mevcut resmi koru
+            if (imageUrlValue) {
+                data.imageUrl = imageUrlValue;
+            } else if (id) {
+                var preview = document.getElementById('currentImagePreview');
+                if (preview && preview.src) {
+                    // Mevcut URL'i backend URL'siz gonder
+                    var currentUrl = preview.src.replace(BACKEND_URL, '');
+                    data.imageUrl = currentUrl;
+                }
+            }
+
+            try {
+                if (id) {
+                    await api('/HeroSlide/' + id, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                    alert('Slide güncellendi!');
+                } else {
+                    await api('/HeroSlide', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                    alert('Slide eklendi!');
+                }
+                slideModal.hide();
+                loadSlides();
+            } catch (error) {
+                alert('Kaydetme sırasında hata oluştu!');
+            }
+        }
+
+        async function deleteSlide(id) {
+            if (!confirm('Bu slide\'ı silmek istediğinizden emin misiniz?')) return;
+            try {
+                await api('/HeroSlide/' + id, { method: 'DELETE' });
+                loadSlides();
+                alert('Slide silindi!');
+            } catch (error) {
+                alert('Silme sırasında hata oluştu.');
+            }
+        }
+    </script>
+</body>
+</html>

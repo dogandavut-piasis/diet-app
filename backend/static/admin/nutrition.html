@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Beslenme Programları Yönetimi</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            margin-top: 20px;
+        }
+        .program-card {
+            transition: transform 0.2s;
+        }
+        .program-card:hover {
+            transform: translateY(-5px);
+        }
+        .preview-image {
+            max-height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body ng-controller="NutritionAdminController as admin">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand text-dark" href="index.html">
+                <i class="bi bi-shield-lock-fill me-2"></i>Admin Panel - Beslenme Programları
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="index.html">
+                            <i class="bi bi-images me-1"></i>Hero Slider
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active text-dark" href="nutrition.html">
+                            <i class="bi bi-card-list me-1"></i>Beslenme Programları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="blog.html">
+                            <i class="bi bi-journal-text me-1"></i>Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="gallery.html">
+                            <i class="bi bi-images me-1"></i>Galeri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="recipes.html">
+                            <i class="bi bi-journal-richtext me-1"></i>Lezzetli Tarifler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="appointments.html">
+                            <i class="bi bi-calendar-check me-1"></i>Randevu Talepleri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="../pages/index.html">
+                            <i class="bi bi-house me-1"></i>Ana Sayfaya Dön
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3">
+                    <i class="bi bi-card-list me-2"></i>Beslenme Programları Yönetimi
+                </h2>
+            </div>
+        </div>
+
+        <!-- Add New Program Button -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Program Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Programs List -->
+        <div class="row" ng-if="admin.programs.length > 0">
+            <div class="col-md-6 col-lg-4 mb-4" ng-repeat="program in admin.programs track by program.id">
+                <div class="card program-card h-100">
+                    <img ng-src="{{program.imageUrl || 'https://via.placeholder.com/400x200?text=Resim+Yok'}}" 
+                         class="card-img-top preview-image" 
+                         alt="{{program.title}}"
+                         onerror="this.src='https://via.placeholder.com/400x200?text=Resim+Yuklenemedi'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{program.title}}</h5>
+                        <p class="card-text text-muted small">{{program.description | limitTo: 100}}{{program.description.length > 100 ? '...' : ''}}</p>
+                        <div class="mb-2">
+                            <span class="badge bg-secondary">Sıra: {{program.order}}</span>
+                            <span class="badge" ng-class="program.isActive ? 'bg-success' : 'bg-danger'">
+                                {{program.isActive ? 'Aktif' : 'Pasif'}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <button class="btn btn-sm btn-warning me-2" ng-click="admin.editProgram(program)">
+                            <i class="bi bi-pencil"></i> Düzenle
+                        </button>
+                        <button class="btn btn-sm btn-danger" ng-click="admin.deleteProgram(program.id)">
+                            <i class="bi bi-trash"></i> Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="row" ng-if="admin.programs.length === 0 && !admin.loading">
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-card-list" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Henüz program eklenmemiş.</p>
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    İlk Programı Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="row" ng-if="admin.loading">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="programModal" tabindex="-1" aria-labelledby="programModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="programModalLabel">
+                        {{admin.editingProgram ? 'Program Düzenle' : 'Yeni Program Ekle'}}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="admin.saveProgram($event)">
+                        <div class="mb-3">
+                            <label for="programTitle" class="form-label">Başlık *</label>
+                            <input type="text" class="form-control" id="programTitle" ng-model="admin.currentProgram.title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="programDescription" class="form-label">Açıklama *</label>
+                            <textarea class="form-control" id="programDescription" rows="5" ng-model="admin.currentProgram.description" required></textarea>
+                            <small class="form-text text-muted">Bu açıklama modal'da görüntülenecektir</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="programImageFile" class="form-label">Görsel</label>
+                            <input type="file" class="form-control" id="programImageFile" accept="image/*" 
+                                   ng-model="admin.imageFile" onchange="angular.element(this).scope().admin.onFileSelected(this)">
+                            <small class="form-text text-muted">Resim dosyası seçin (JPG, PNG, GIF - Max 5MB)</small>
+                            <div ng-if="admin.currentProgram.imageUrl" class="mt-2">
+                                <img ng-src="{{admin.currentProgram.imageUrl}}" alt="Önizleme" 
+                                     style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;" 
+                                     onerror="this.src='https://via.placeholder.com/200x150?text=Resim+Yuklenemedi'">
+                                <div class="mt-2">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           ng-model="admin.currentProgram.imageUrl" 
+                                           placeholder="Veya manuel URL girin">
+                                </div>
+                            </div>
+                            <div ng-if="admin.uploading" class="mt-2">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <span class="ms-2">Yükleniyor...</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="programOrder" class="form-label">Sıra *</label>
+                                <input type="number" class="form-control" id="programOrder" ng-model="admin.currentProgram.order" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Durum</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="programIsActive" ng-model="admin.currentProgram.isActive">
+                                    <label class="form-check-label" for="programIsActive">
+                                        Aktif
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin JS -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('NutritionAdminController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.programs = [];
+            vm.loading = false;
+            vm.editingProgram = false;
+            vm.currentProgram = {};
+            vm.imageFile = null;
+            vm.uploading = false;
+            var programModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load all programs
+            vm.loadPrograms = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/NutritionProgram/All')
+                    .then(function(response) {
+                        // Resim URL'lerini normalize et
+                        vm.programs = response.data.map(function(program) {
+                            if (program.imageUrl) {
+                                program.imageUrl = vm.normalizeImageUrl(program.imageUrl);
+                            }
+                            return program;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading programs:', error);
+                        alert('Programlar yüklenirken hata oluştu!');
+                        vm.loading = false;
+                    });
+            };
+            
+            // Initialize modal
+            vm.initModal = function() {
+                var modalElement = document.getElementById('programModal');
+                if (modalElement && !programModal) {
+                    programModal = new bootstrap.Modal(modalElement);
+                }
+            };
+            
+            // File selected handler
+            vm.onFileSelected = function(input) {
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    vm.uploadImage(file);
+                }
+            };
+            
+            // Upload image
+            vm.uploadImage = function(file) {
+                vm.uploading = true;
+                var formData = new FormData();
+                formData.append('file', file);
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', apiBaseUrl + '/FileUpload/upload-image', true);
+                
+                xhr.onload = function() {
+                    vm.uploading = false;
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        vm.currentProgram.imageUrl = response.imageUrl;
+                        $scope.$apply();
+                    } else {
+                        var error = JSON.parse(xhr.responseText);
+                        var errorMsg = error && error.message ? error.message : 'Resim yüklenirken hata oluştu!';
+                        alert('Hata: ' + errorMsg);
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    vm.uploading = false;
+                    $scope.$apply();
+                    alert('Resim yüklenirken bir hata oluştu!');
+                };
+                
+                xhr.send(formData);
+            };
+            
+            // Show add modal
+            vm.showAddModal = function() {
+                vm.editingProgram = false;
+                vm.currentProgram = {
+                    title: '',
+                    description: '',
+                    imageUrl: '',
+                    order: vm.programs.length,
+                    isActive: true
+                };
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('programImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (programModal) {
+                    programModal.show();
+                }
+            };
+            
+            // Edit program
+            vm.editProgram = function(program) {
+                vm.editingProgram = true;
+                vm.currentProgram = angular.copy(program);
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('programImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (programModal) {
+                    programModal.show();
+                }
+            };
+            
+            // Save program
+            vm.saveProgram = function($event) {
+                if ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                }
+                
+                if (!vm.currentProgram.title || !vm.currentProgram.description) {
+                    alert('Lütfen başlık ve açıklama alanlarını doldurun!');
+                    return false;
+                }
+                
+                if (vm.editingProgram) {
+                    $http.put(apiBaseUrl + '/NutritionProgram/' + vm.currentProgram.id, vm.currentProgram)
+                        .then(function(response) {
+                            if (programModal) {
+                                programModal.hide();
+                            }
+                            vm.loadPrograms();
+                            alert('Program başarıyla güncellendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error updating program:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Program güncellenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                } else {
+                    $http.post(apiBaseUrl + '/NutritionProgram', vm.currentProgram)
+                        .then(function(response) {
+                            if (programModal) {
+                                programModal.hide();
+                            }
+                            vm.loadPrograms();
+                            alert('Program başarıyla eklendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error creating program:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Program eklenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                }
+                return false;
+            };
+            
+            // Delete program
+            vm.deleteProgram = function(id) {
+                if (confirm('Bu programı silmek istediğinize emin misiniz?')) {
+                    $http.delete(apiBaseUrl + '/NutritionProgram/' + id)
+                        .then(function(response) {
+                            vm.loadPrograms();
+                            alert('Program başarıyla silindi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error deleting program:', error);
+                            alert('Program silinirken hata oluştu!');
+                        });
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadPrograms();
+                setTimeout(function() {
+                    vm.initModal();
+                }, 100);
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

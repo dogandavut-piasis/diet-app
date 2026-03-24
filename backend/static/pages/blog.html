@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Diyetisyen</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .blog-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .blog-image {
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .blog-card:hover .blog-image {
+            transform: scale(1.1);
+        }
+        
+        .blog-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .blog-card:hover .blog-overlay {
+            opacity: 1;
+        }
+        
+        .blog-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .blog-detail-content {
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        
+        .blog-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body ng-controller="BlogController as blog">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Diyetisyen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition-programs.html">Beslenme Programları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gallery.html">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recipes.html">Lezzetli Tarifler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="appointment.html">Randevu Al</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#contact">İletişim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="../admin/index.html" title="Admin Panel">
+                            <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1 class="display-4 fw-bold mb-3">Blog</h1>
+                    <p class="lead">Sağlıklı beslenme ve diyet hakkında güncel yazılarımız</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Posts Section -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Loading -->
+            <div class="row" ng-if="blog.loading">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div class="row g-4" ng-if="!blog.loading && blog.posts.length > 0">
+                <div class="col-md-6 col-lg-4" ng-repeat="post in blog.posts track by post.id">
+                    <div class="card blog-card h-100 shadow-sm" ng-click="blog.openDetail(post)">
+                        <div class="position-relative">
+                            <img ng-src="{{post.imageUrl || 'https://via.placeholder.com/400x250/4A90E2/FFFFFF?text=' + post.title}}" 
+                                 class="card-img-top blog-image" 
+                                 alt="{{post.title}}"
+                                 onerror="this.src='https://via.placeholder.com/400x250?text=Resim+Yuklenemedi'">
+                            <div class="blog-overlay"></div>
+                        </div>
+                        <div class="card-body blog-content">
+                            <h5 class="card-title fw-bold mb-3">{{post.title}}</h5>
+                            <p class="card-text text-muted mb-3">
+                                {{post.excerpt || (post.content | limitTo: 150)}}{{post.content.length > 150 ? '...' : ''}}
+                            </p>
+                            <div class="blog-meta mb-2">
+                                <i class="bi bi-person me-1"></i>{{post.author}}
+                                <span class="ms-3"><i class="bi bi-calendar me-1"></i>{{post.publishedDate | date:'dd.MM.yyyy'}}</span>
+                                <span class="ms-3"><i class="bi bi-eye me-1"></i>{{post.viewCount}}</span>
+                            </div>
+                            <div class="d-flex align-items-center text-primary mt-3">
+                                <span>Devamını Oku</span>
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="row" ng-if="!blog.loading && blog.posts.length === 0">
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-journal-text" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Henüz blog yazısı eklenmemiş.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Detail Modal -->
+    <div class="modal fade" id="blogDetailModal" tabindex="-1" aria-labelledby="blogDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="blogDetailModalLabel">
+                        <i class="bi bi-journal-text me-2"></i>{{blog.selectedPost.title}}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="blog-meta mb-3 pb-3 border-bottom">
+                        <i class="bi bi-person me-1"></i><strong>{{blog.selectedPost.author}}</strong>
+                        <span class="ms-3"><i class="bi bi-calendar me-1"></i>{{blog.selectedPost.publishedDate | date:'dd.MM.yyyy'}}</span>
+                        <span class="ms-3"><i class="bi bi-eye me-1"></i>{{blog.selectedPost.viewCount}} görüntülenme</span>
+                    </div>
+                    <div ng-if="blog.selectedPost.imageUrl" class="text-center mb-4">
+                        <img ng-src="{{blog.selectedPost.imageUrl}}" 
+                             alt="{{blog.selectedPost.title}}" 
+                             class="img-fluid rounded shadow"
+                             style="max-height: 400px; width: auto;"
+                             onerror="this.src='https://via.placeholder.com/600x300?text=Resim+Yuklenemedi'">
+                    </div>
+                    <div class="blog-detail-content">
+                        <p class="lead" style="white-space: pre-wrap;">{{blog.selectedPost.content}}</p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+                    <p class="mb-0">&copy; 2024 Diyetisyen. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <a href="https://www.instagram.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://www.twitter.com/" target="_blank" class="text-white" style="font-size: 1.5rem;">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('BlogController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.posts = [];
+            vm.loading = false;
+            vm.selectedPost = {};
+            var blogModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load blog posts
+            vm.loadPosts = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/BlogPost')
+                    .then(function(response) {
+                        // Resim URL'lerini normalize et
+                        vm.posts = response.data.map(function(post) {
+                            if (post.imageUrl) {
+                                post.imageUrl = vm.normalizeImageUrl(post.imageUrl);
+                            }
+                            // Tarih formatı
+                            if (post.publishedDate) {
+                                post.publishedDate = new Date(post.publishedDate);
+                            }
+                            return post;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading blog posts:', error);
+                        vm.loading = false;
+                    });
+            };
+            
+            // Open detail modal
+            vm.openDetail = function(post) {
+                vm.selectedPost = angular.copy(post);
+                // Load full post to get view count update
+                $http.get(apiBaseUrl + '/BlogPost/' + post.id)
+                    .then(function(response) {
+                        vm.selectedPost = response.data;
+                        if (vm.selectedPost.imageUrl) {
+                            vm.selectedPost.imageUrl = vm.normalizeImageUrl(vm.selectedPost.imageUrl);
+                        }
+                        if (vm.selectedPost.publishedDate) {
+                            vm.selectedPost.publishedDate = new Date(vm.selectedPost.publishedDate);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading blog post:', error);
+                    });
+                
+                var modalElement = document.getElementById('blogDetailModal');
+                if (modalElement) {
+                    blogModal = new bootstrap.Modal(modalElement);
+                    blogModal.show();
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadPosts();
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

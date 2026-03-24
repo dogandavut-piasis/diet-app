@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri - Diyetisyen</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover .gallery-image {
+            transform: scale(1.1);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            color: white;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .gallery-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body ng-controller="GalleryController as gallery">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Diyetisyen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nutrition-programs.html">Beslenme Programları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="gallery.html">Galeri</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recipes.html">Lezzetli Tarifler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="appointment.html">Randevu Al</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#contact">İletişim</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="../admin/index.html" title="Admin Panel">
+                            <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1 class="display-4 fw-bold mb-3">Galeri</h1>
+                    <p class="lead">Beslenme programlarımız ve çalışmalarımızdan örnekler</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Loading -->
+            <div class="row" ng-if="gallery.loading">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="row g-4" ng-if="!gallery.loading && gallery.images.length > 0">
+                <div class="col-md-6 col-lg-4" ng-repeat="image in gallery.images track by image.id">
+                    <div class="gallery-item" ng-click="gallery.openModal(image)">
+                        <img ng-src="{{image.imageUrl || 'https://via.placeholder.com/400x300/4A90E2/FFFFFF?text=' + image.title}}" 
+                             class="gallery-image" 
+                             alt="{{image.title}}"
+                             onerror="this.src='https://via.placeholder.com/400x300?text=Resim+Yuklenemedi'">
+                        <div class="gallery-overlay">
+                            <div class="gallery-title">{{image.title}}</div>
+                            <div class="gallery-description" ng-if="image.description">{{image.description}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="row" ng-if="!gallery.loading && gallery.images.length === 0">
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-images" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Henüz galeri resmi eklenmemiş.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Image Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="galleryModalLabel">
+                        <i class="bi bi-image me-2"></i>{{gallery.selectedImage.title}}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img ng-src="{{gallery.selectedImage.imageUrl}}" 
+                         alt="{{gallery.selectedImage.title}}" 
+                         class="img-fluid w-100"
+                         style="max-height: 70vh; object-fit: contain;"
+                         onerror="this.src='https://via.placeholder.com/600x400?text=Resim+Yuklenemedi'">
+                    <div class="p-4" ng-if="gallery.selectedImage.description">
+                        <p class="lead mb-0">{{gallery.selectedImage.description}}</p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+                    <p class="mb-0">&copy; 2024 Diyetisyen. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-lg-6 text-center text-lg-end">
+                    <a href="https://www.instagram.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" target="_blank" class="text-white me-3" style="font-size: 1.5rem;">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="https://www.twitter.com/" target="_blank" class="text-white" style="font-size: 1.5rem;">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('GalleryController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.images = [];
+            vm.loading = false;
+            vm.selectedImage = {};
+            var galleryModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load gallery images
+            vm.loadImages = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/GalleryImage')
+                    .then(function(response) {
+                        // Resim URL'lerini normalize et
+                        vm.images = response.data.map(function(image) {
+                            if (image.imageUrl) {
+                                image.imageUrl = vm.normalizeImageUrl(image.imageUrl);
+                            }
+                            return image;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading gallery images:', error);
+                        vm.loading = false;
+                    });
+            };
+            
+            // Open modal
+            vm.openModal = function(image) {
+                vm.selectedImage = angular.copy(image);
+                var modalElement = document.getElementById('galleryModal');
+                if (modalElement) {
+                    galleryModal = new bootstrap.Modal(modalElement);
+                    galleryModal.show();
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadImages();
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

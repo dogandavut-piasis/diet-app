@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sağlıklı Tarifler | Diyetisyen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+    <style>
+        .recipe-meta { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .recipe-meta-item { display: flex; align-items: center; gap: .35rem; font-size: .85rem; color: var(--text-muted); }
+        .recipe-meta-item i { color: var(--primary); }
+        .badge-difficulty { font-size: .75rem; padding: .3rem .7rem; border-radius: 20px; font-weight: 600; }
+        .badge-easy { background: rgba(40,167,69,.12); color: #28a745; }
+        .badge-medium { background: rgba(255,193,7,.15); color: #d4a017; }
+        .badge-hard { background: rgba(220,53,69,.12); color: #dc3545; }
+        .recipe-card { cursor: pointer; }
+        .modal-recipe-img { width: 100%; max-height: 350px; object-fit: cover; border-radius: var(--radius); margin-bottom: 1.5rem; }
+        .ingredient-list li { padding: .4rem 0; border-bottom: 1px solid var(--border); }
+        .ingredient-list li:last-child { border-bottom: none; }
+        .instruction-step { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .step-number {
+            min-width: 32px; height: 32px; border-radius: 50%;
+            background: var(--primary); color: #fff; display: flex;
+            align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Diyetisyen<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Ana Sayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="blog.html">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="gallery.html">Galeri</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="recipes.html">Tarifler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="nutrition-programs.html">Programlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="appointment.html">Randevu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../admin/login.html"><i class="bi bi-person-circle"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Sağlıklı Tarifler</h1>
+            <p>Lezzetli ve besleyici tariflerle sağlıklı yaşamınızı destekleyin</p>
+        </div>
+    </section>
+
+    <!-- Recipes -->
+    <section class="section">
+        <div class="container">
+            <div id="recipesLoading" class="text-center py-5">
+                <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p class="mt-3 text-muted">Tarifler yükleniyor...</p>
+            </div>
+            <div id="recipesEmpty" class="text-center py-5 d-none">
+                <i class="bi bi-egg-fried" style="font-size: 3rem; color: var(--text-muted);"></i>
+                <p class="mt-3 text-muted">Henüz tarif bulunmamaktadır.</p>
+            </div>
+            <div class="row g-4" id="recipesGrid"></div>
+        </div>
+    </section>
+
+    <!-- Recipe Detail Modal -->
+    <div class="modal fade" id="recipeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border:none; border-radius: var(--radius);">
+                <div class="modal-header border-0">
+                    <h4 class="modal-title fw-bold" id="recipeModalTitle"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="recipeModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="footer-brand mb-3">Diyetisyen<span>.</span></div>
+                    <p>Sağlıklı beslenme ve yaşam için profesyonel danışmanlık hizmeti.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-white mb-3">Hızlı Bağlantılar</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="../index.html">Ana Sayfa</a></li>
+                        <li class="mb-2"><a href="blog.html">Blog</a></li>
+                        <li class="mb-2"><a href="recipes.html">Tarifler</a></li>
+                        <li class="mb-2"><a href="appointment.html">Randevu Al</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-white mb-3">İletişim</h6>
+                    <p><i class="bi bi-envelope me-2"></i>info@diyetisyen.com</p>
+                    <p><i class="bi bi-phone me-2"></i>+90 (555) 123 45 67</p>
+                    <div class="mt-3">
+                        <a href="#" class="me-3"><i class="bi bi-instagram fs-5"></i></a>
+                        <a href="#" class="me-3"><i class="bi bi-facebook fs-5"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x fs-5"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center mb-0" style="font-size:.9rem;">&copy; 2026 Diyetisyen. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function getDifficultyBadge(difficulty) {
+            if (!difficulty) return '';
+            var d = difficulty.toLowerCase();
+            if (d === 'kolay' || d === 'easy') return '<span class="badge-difficulty badge-easy">Kolay</span>';
+            if (d === 'orta' || d === 'medium') return '<span class="badge-difficulty badge-medium">Orta</span>';
+            if (d === 'zor' || d === 'hard') return '<span class="badge-difficulty badge-hard">Zor</span>';
+            return '<span class="badge-difficulty badge-easy">' + difficulty + '</span>';
+        }
+
+        function openRecipeModal(recipe) {
+            var modal = new bootstrap.Modal(document.getElementById('recipeModal'));
+            document.getElementById('recipeModalTitle').textContent = recipe.title || '';
+
+            var body = '';
+
+            if (recipe.imageUrl || recipe.featuredImageUrl) {
+                body += '<img src="' + imgUrl(recipe.imageUrl || recipe.featuredImageUrl) + '" alt="' + (recipe.title || '') + '" class="modal-recipe-img" onerror="imgError(this)">';
+            }
+
+            body += '<div class="d-flex flex-wrap gap-3 mb-3">';
+            body += getDifficultyBadge(recipe.difficulty);
+            if (recipe.prepTime) body += '<span class="recipe-meta-item"><i class="bi bi-clock"></i> Hazırlık: ' + recipe.prepTime + ' dk</span>';
+            if (recipe.cookTime) body += '<span class="recipe-meta-item"><i class="bi bi-fire"></i> Pişirme: ' + recipe.cookTime + ' dk</span>';
+            if (recipe.servings) body += '<span class="recipe-meta-item"><i class="bi bi-people"></i> ' + recipe.servings + ' kişilik</span>';
+            body += '</div>';
+
+            if (recipe.description) {
+                body += '<p class="mb-4">' + recipe.description + '</p>';
+            }
+
+            if (recipe.ingredients) {
+                body += '<h5 class="fw-bold mb-3"><i class="bi bi-list-check me-2 text-success"></i>Malzemeler</h5>';
+                body += '<ul class="list-unstyled ingredient-list mb-4">';
+                var ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : recipe.ingredients.split('\n');
+                ingredients.forEach(function (ing) {
+                    if (ing && ing.trim()) {
+                        body += '<li><i class="bi bi-check2 text-success me-2"></i>' + ing.trim() + '</li>';
+                    }
+                });
+                body += '</ul>';
+            }
+
+            if (recipe.instructions) {
+                body += '<h5 class="fw-bold mb-3"><i class="bi bi-journal-text me-2 text-success"></i>Hazırlanışı</h5>';
+                var instructions = Array.isArray(recipe.instructions) ? recipe.instructions : recipe.instructions.split('\n');
+                var step = 1;
+                instructions.forEach(function (inst) {
+                    if (inst && inst.trim()) {
+                        body += '<div class="instruction-step">' +
+                            '<div class="step-number">' + step + '</div>' +
+                            '<p class="mb-0">' + inst.trim() + '</p>' +
+                            '</div>';
+                        step++;
+                    }
+                });
+            }
+
+            document.getElementById('recipeModalBody').innerHTML = body;
+            modal.show();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            api('/Recipe/All')
+                .then(function (recipes) {
+                    var loading = el('recipesLoading');
+                    var grid = el('recipesGrid');
+                    var empty = el('recipesEmpty');
+                    loading.classList.add('d-none');
+
+                    if (!recipes || recipes.length === 0) {
+                        empty.classList.remove('d-none');
+                        return;
+                    }
+
+                    recipes.forEach(function (recipe, i) {
+                        var col = document.createElement('div');
+                        col.className = 'col-md-6 col-lg-4 fade-up';
+                        col.style.transitionDelay = (i * 0.05) + 's';
+
+                        col.innerHTML =
+                            '<div class="card-modern recipe-card">' +
+                                '<img src="' + imgUrl(recipe.imageUrl || recipe.featuredImageUrl) + '" alt="' + (recipe.title || '') + '" onerror="imgError(this)">' +
+                                '<div class="card-body">' +
+                                    '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                                        '<h5 class="card-title mb-0">' + (recipe.title || '') + '</h5>' +
+                                        getDifficultyBadge(recipe.difficulty) +
+                                    '</div>' +
+                                    '<p class="card-text mb-3">' + truncate(recipe.excerpt || recipe.description || '', 100) + '</p>' +
+                                    '<div class="recipe-meta">' +
+                                        (recipe.prepTime ? '<span class="recipe-meta-item"><i class="bi bi-clock"></i>' + recipe.prepTime + ' dk</span>' : '') +
+                                        (recipe.cookTime ? '<span class="recipe-meta-item"><i class="bi bi-fire"></i>' + recipe.cookTime + ' dk</span>' : '') +
+                                        (recipe.servings ? '<span class="recipe-meta-item"><i class="bi bi-people"></i>' + recipe.servings + ' kişi</span>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+
+                        col.addEventListener('click', function () {
+                            openRecipeModal(recipe);
+                        });
+
+                        grid.appendChild(col);
+                    });
+
+                    initAnimations();
+                })
+                .catch(function (err) {
+                    console.error('Tarifler yüklenirken hata:', err);
+                    el('recipesLoading').classList.add('d-none');
+                    el('recipesEmpty').classList.remove('d-none');
+                    el('recipesEmpty').innerHTML =
+                        '<i class="bi bi-exclamation-triangle" style="font-size:3rem; color:var(--accent);"></i>' +
+                        '<p class="mt-3 text-muted">Tarifler yüklenirken bir hata oluştu.</p>';
+                });
+        });
+    </script>
+</body>
+</html>

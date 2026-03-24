@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarif Yönetimi - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+  <script src="../js/config.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/app.js"></script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <h4 class="mb-0 fw-bold">Admin Panel</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html"><i class="bi bi-images me-2"></i>Hero Slider</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="nutrition.html"><i class="bi bi-heart-pulse me-2"></i>Beslenme</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="blog.html"><i class="bi bi-journal-richtext me-2"></i>Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="gallery.html"><i class="bi bi-card-image me-2"></i>Galeri</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="recipes.html"><i class="bi bi-egg-fried me-2"></i>Tarifler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="appointments.html"><i class="bi bi-calendar-check me-2"></i>Randevular</a>
+                </li>
+                <li><hr class="dropdown-divider mx-3"></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/index.html"><i class="bi bi-house me-2"></i>Ana Sayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="#" onclick="adminLogout()"><i class="bi bi-box-arrow-right me-2"></i>Çıkış</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Tarif Yönetimi</h2>
+                    <p class="text-muted mb-0">Sağlıklı tarifleri yönetin</p>
+                </div>
+                <button class="btn btn-primary-custom" onclick="openAddModal()">
+                    <i class="bi bi-plus-lg me-2"></i>Yeni Tarif Ekle
+                </button>
+            </div>
+
+            <div class="table-responsive mt-4">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Görsel</th>
+                            <th>Başlık</th>
+                            <th>Zorluk</th>
+                            <th>Süre</th>
+                            <th>Porsiyon</th>
+                            <th>Sıra</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recipesTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="mt-2 text-muted mb-0">Yükleniyor...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="recipeModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Yeni Tarif Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="recipeForm">
+                        <input type="hidden" id="recipeId">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-medium">Başlık</label>
+                                <input type="text" class="form-control" id="recipeTitle" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Zorluk</label>
+                                <select class="form-select" id="recipeDifficulty">
+                                    <option value="Kolay">Kolay</option>
+                                    <option value="Orta">Orta</option>
+                                    <option value="Zor">Zor</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Özet</label>
+                                <input type="text" class="form-control" id="recipeExcerpt">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Açıklama</label>
+                                <textarea class="form-control" id="recipeDescription" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Malzemeler</label>
+                                <textarea class="form-control" id="recipeIngredients" rows="6" placeholder="Her satıra bir malzeme yazın"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Yapılışı</label>
+                                <textarea class="form-control" id="recipeInstructions" rows="6" placeholder="Her satıra bir adım yazın"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Hazırlık Süresi (dk)</label>
+                                <input type="number" class="form-control" id="recipePrepTime" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Pişirme Süresi (dk)</label>
+                                <input type="number" class="form-control" id="recipeCookTime" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Porsiyon</label>
+                                <input type="number" class="form-control" id="recipeServings" min="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Görsel</label>
+                                <input type="file" class="form-control" id="recipeImage" accept="image/*">
+                                <div id="currentImage" class="mt-2 d-none">
+                                    <small class="text-muted">Mevcut görsel:</small>
+                                    <img id="currentImagePreview" src="" class="d-block mt-1 rounded" style="max-height: 80px;" onerror="imgError(this)">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Sıra</label>
+                                <input type="number" class="form-control" id="recipeOrder" value="0">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="recipeIsActive" checked>
+                                    <label class="form-check-label fw-medium" for="recipeIsActive">Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary-custom" onclick="saveRecipe()">
+                        <i class="bi bi-check-lg me-1"></i>Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let recipeModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            recipeModal = new bootstrap.Modal(document.getElementById('recipeModal'));
+            loadRecipes();
+        });
+
+        function getDifficultyBadge(difficulty) {
+            const map = { 'Kolay': 'bg-success', 'Orta': 'bg-warning text-dark', 'Zor': 'bg-danger' };
+            return `<span class="badge ${map[difficulty] || 'bg-secondary'}">${difficulty || '-'}</span>`;
+        }
+
+        async function loadRecipes() {
+            try {
+                const recipes = await api('/Recipe/All');
+                const tbody = document.getElementById('recipesTableBody');
+
+                if (!recipes || recipes.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">Henüz tarif eklenmemiş</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = recipes.map(r => `
+                    <tr>
+                        <td>
+                            <img src="${imgUrl(r.imageUrl || r.imagePath)}"
+                                 style="width: 60px; height: 40px; object-fit: cover; border-radius: 6px;"
+                                 onerror="imgError(this)">
+                        </td>
+                        <td class="fw-medium">${r.title}</td>
+                        <td>${getDifficultyBadge(r.difficulty)}</td>
+                        <td>${(r.prepTime || 0) + (r.cookTime || 0)} dk</td>
+                        <td>${r.servings || '-'}</td>
+                        <td>${r.order ?? 0}</td>
+                        <td>
+                            <span class="badge ${r.isActive ? 'bg-success' : 'bg-secondary'}">
+                                ${r.isActive ? 'Aktif' : 'Pasif'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editRecipe(${r.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteRecipe(${r.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                document.getElementById('recipesTableBody').innerHTML = `
+                    <tr><td colspan="8" class="text-center py-4">
+                        <div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Veriler yüklenirken hata oluştu.</div>
+                    </td></tr>`;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Yeni Tarif Ekle';
+            document.getElementById('recipeForm').reset();
+            document.getElementById('recipeId').value = '';
+            document.getElementById('recipeIsActive').checked = true;
+            document.getElementById('currentImage').classList.add('d-none');
+            recipeModal.show();
+        }
+
+        async function editRecipe(id) {
+            try {
+                const r = await api('/Recipe/' + id);
+                document.getElementById('modalTitle').textContent = 'Tarif Düzenle';
+                document.getElementById('recipeId').value = r.id;
+                document.getElementById('recipeTitle').value = r.title || '';
+                document.getElementById('recipeExcerpt').value = r.excerpt || '';
+                document.getElementById('recipeDescription').value = r.description || '';
+                document.getElementById('recipeIngredients').value = r.ingredients || '';
+                document.getElementById('recipeInstructions').value = r.instructions || '';
+                document.getElementById('recipePrepTime').value = r.prepTime || '';
+                document.getElementById('recipeCookTime').value = r.cookTime || '';
+                document.getElementById('recipeServings').value = r.servings || '';
+                document.getElementById('recipeDifficulty').value = r.difficulty || 'Kolay';
+                document.getElementById('recipeOrder').value = r.order ?? 0;
+                document.getElementById('recipeIsActive').checked = r.isActive;
+                document.getElementById('recipeImage').value = '';
+
+                if (r.imageUrl || r.imagePath) {
+                    document.getElementById('currentImage').classList.remove('d-none');
+                    document.getElementById('currentImagePreview').src = imgUrl(r.imageUrl || r.imagePath);
+                } else {
+                    document.getElementById('currentImage').classList.add('d-none');
+                }
+
+                recipeModal.show();
+            } catch (error) {
+                alert('Tarif bilgileri yüklenirken hata oluştu.');
+            }
+        }
+
+        async function saveRecipe() {
+            const id = document.getElementById('recipeId').value;
+
+            var imageUrlValue = '';
+            const imageFile = document.getElementById('recipeImage').files[0];
+            if (imageFile) {
+                var result = await apiUpload(imageFile);
+                imageUrlValue = result.imageUrl;
+            }
+
+            var data = {
+                title: document.getElementById('recipeTitle').value,
+                excerpt: document.getElementById('recipeExcerpt').value,
+                description: document.getElementById('recipeDescription').value,
+                ingredients: document.getElementById('recipeIngredients').value,
+                instructions: document.getElementById('recipeInstructions').value,
+                prepTime: parseInt(document.getElementById('recipePrepTime').value) || 0,
+                cookTime: parseInt(document.getElementById('recipeCookTime').value) || 0,
+                servings: parseInt(document.getElementById('recipeServings').value) || 1,
+                difficulty: document.getElementById('recipeDifficulty').value,
+                order: parseInt(document.getElementById('recipeOrder').value) || 0,
+                isActive: document.getElementById('recipeIsActive').checked
+            };
+
+            if (imageUrlValue) {
+                data.imageUrl = imageUrlValue;
+            } else if (id) {
+                var currentSrc = document.getElementById('currentImagePreview').src;
+                if (currentSrc) {
+                    data.imageUrl = currentSrc.replace(imgUrl(''), '');
+                }
+            }
+
+            try {
+                if (id) {
+                    data.id = parseInt(id);
+                    await api('/Recipe/' + id, { method: 'PUT', body: JSON.stringify(data) });
+                } else {
+                    await api('/Recipe', { method: 'POST', body: JSON.stringify(data) });
+                }
+                recipeModal.hide();
+                loadRecipes();
+            } catch (error) {
+                alert('Kaydetme sırasında hata oluştu: ' + (error.message || error));
+            }
+        }
+
+        async function deleteRecipe(id) {
+            if (!confirm('Bu tarifi silmek istediğinizden emin misiniz?')) return;
+            try {
+                await api('/Recipe/' + id, { method: 'DELETE' });
+                loadRecipes();
+            } catch (error) {
+                alert('Silme sırasında hata oluştu.');
+            }
+        }
+    </script>
+</body>
+</html>

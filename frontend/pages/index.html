@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diyetisyen - Sağlıklı Yaşam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/config.js"></script>
+  <script src="../js/app.js"></script>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><i class="bi bi-heart-pulse"></i> Diyet<span>isyen</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Ana Sayfa</a></li>
+          <li class="nav-item"><a class="nav-link" href="blog.html">Blog</a></li>
+          <li class="nav-item"><a class="nav-link" href="gallery.html">Galeri</a></li>
+          <li class="nav-item"><a class="nav-link" href="recipes.html">Tarifler</a></li>
+          <li class="nav-item"><a class="nav-link" href="nutrition.html">Beslenme</a></li>
+          <li class="nav-item"><a class="nav-link" href="appointment.html">Randevu</a></li>
+          <li class="nav-item"><a class="nav-link" href="../admin/index.html">Admin Paneli</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SLIDER ===== -->
+  <section class="hero" id="heroSection">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="container">
+      <div class="hero-content" id="heroContent">
+        <h1 id="heroTitle">Sağlıklı Yaşamın Anahtarı</h1>
+        <p id="heroDesc">Kişiye özel beslenme programları ile hayalinizdeki sağlıklı yaşama kavuşun.</p>
+        <a href="appointment.html" class="btn-primary-custom">Randevu Al</a>
+      </div>
+    </div>
+    <div class="hero-dots" id="heroDots"></div>
+  </section>
+
+  <!-- ===== BMI CALCULATOR ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="bmi-section fade-up">
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-4 mb-lg-0">
+            <h2 class="fw-bold mb-3"><i class="bi bi-calculator"></i> Vücut Kitle İndeksi Hesapla</h2>
+            <p class="opacity-75">Boy ve kilonuzu girerek vücut kitle indeksinizi hızlıca öğrenin.</p>
+            <div class="row g-3 mt-2">
+              <div class="col-6">
+                <input type="number" id="bmiHeight" class="form-control" placeholder="Boy (cm)" min="100" max="250">
+              </div>
+              <div class="col-6">
+                <input type="number" id="bmiWeight" class="form-control" placeholder="Kilo (kg)" min="30" max="300">
+              </div>
+              <div class="col-12">
+                <button class="btn-accent w-100" onclick="calculateBMI()">Hesapla</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="bmi-result text-center" id="bmiResult" style="display:none;">
+              <p class="mb-1 opacity-75">Vücut Kitle İndeksiniz</p>
+              <div class="bmi-value" id="bmiValue">--</div>
+              <p class="mt-2 mb-0 fs-5" id="bmiCategory"></p>
+            </div>
+            <div class="bmi-result text-center" id="bmiPlaceholder">
+              <p class="mb-0 opacity-50"><i class="bi bi-arrow-left-circle" style="font-size:2rem;"></i></p>
+              <p class="mb-0 opacity-50 mt-2">Boy ve kilonuzu girin, sonucu burada görün.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LATEST BLOG POSTS ===== -->
+  <section class="section section-bg">
+    <div class="container">
+      <div class="text-center fade-up">
+        <h2 class="section-title">Son Blog Yazıları</h2>
+        <p class="section-subtitle">Sağlıklı yaşam hakkında en güncel bilgiler</p>
+      </div>
+      <div class="row g-4" id="latestBlogs">
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+      </div>
+      <div class="text-center mt-4 fade-up">
+        <a href="blog.html" class="btn-outline-custom">Tüm Yazıları Gör <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LATEST GALLERY IMAGES ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center fade-up">
+        <h2 class="section-title">Galeri</h2>
+        <p class="section-subtitle">Sağlıklı yaşamdan kareler</p>
+      </div>
+      <div class="row g-4" id="latestGallery">
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+      </div>
+      <div class="text-center mt-4 fade-up">
+        <a href="gallery.html" class="btn-outline-custom">Tüm Görseller <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LATEST RECIPES ===== -->
+  <section class="section section-bg">
+    <div class="container">
+      <div class="text-center fade-up">
+        <h2 class="section-title">Son Tarifler</h2>
+        <p class="section-subtitle">Sağlıklı ve lezzetli tarif önerileri</p>
+      </div>
+      <div class="row g-4" id="latestRecipes">
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+        <div class="col-md-4"><div class="card-modern"><div class="img-placeholder"><i class="bi bi-image"></i></div><div class="card-body"><p class="card-text">Yükleniyor...</p></div></div></div>
+      </div>
+      <div class="text-center mt-4 fade-up">
+        <a href="recipes.html" class="btn-outline-custom">Tüm Tarifler <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APPOINTMENT FORM ===== -->
+  <section class="section" id="appointmentSection">
+    <div class="container">
+      <div class="text-center fade-up">
+        <h2 class="section-title">Randevu Talebi</h2>
+        <p class="section-subtitle">Formu doldurun, size en kısa sürede dönüş yapalım</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card-modern fade-up">
+            <div class="card-body p-4 p-lg-5">
+              <form class="form-modern" id="appointmentForm" onsubmit="submitAppointment(event)">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="apptName">Ad Soyad</label>
+                    <input type="text" class="form-control" id="apptName" name="fullName" required placeholder="Adınız Soyadınız">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apptPhone">Telefon</label>
+                    <input type="tel" class="form-control" id="apptPhone" name="phone" required placeholder="05XX XXX XX XX">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apptEmail">E-posta</label>
+                    <input type="email" class="form-control" id="apptEmail" name="email" required placeholder="ornek@email.com">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apptPreference">Randevu Tercihi</label>
+                    <select class="form-select" id="apptPreference" name="appointmentPreference" required>
+                      <option value="" disabled selected>Seçiniz</option>
+                      <option value="Online">Online</option>
+                      <option value="Yüz Yüze">Yüz Yüze</option>
+                    </select>
+                  </div>
+                  <div class="col-md-12">
+                    <label for="apptGoal">Hedefiniz</label>
+                    <select class="form-select" id="apptGoal" name="goal" required>
+                      <option value="" disabled selected>Seçiniz</option>
+                      <option value="Kilo verme">Kilo verme</option>
+                      <option value="Kilo alma">Kilo alma</option>
+                      <option value="Sağlıklı beslenme">Sağlıklı beslenme</option>
+                      <option value="Diğer">Diğer</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label for="apptMessage">Mesajınız</label>
+                    <textarea class="form-control" id="apptMessage" name="message" rows="4" placeholder="Eklemek istediğiniz notlar..."></textarea>
+                  </div>
+                  <div class="col-12">
+                    <div id="apptAlert" style="display:none;" class="mb-3"></div>
+                    <button type="submit" class="btn-primary-custom w-100" id="apptSubmitBtn">
+                      <i class="bi bi-send"></i> Randevu Talebi Gönder
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand">
+            <h4><i class="bi bi-heart-pulse"></i> Diyet<span style="color:var(--accent);">isyen</span></h4>
+            <p class="mt-2">Sağlıklı beslenme ve yaşam koçluğu ile hayatınızı dönüştürün. Kişiye özel beslenme programları ile yanınızdayız.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <h5 class="mb-3">Hızlı Bağlantılar</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="index.html"><i class="bi bi-chevron-right"></i> Ana Sayfa</a></li>
+            <li class="mb-2"><a href="blog.html"><i class="bi bi-chevron-right"></i> Blog</a></li>
+            <li class="mb-2"><a href="gallery.html"><i class="bi bi-chevron-right"></i> Galeri</a></li>
+            <li class="mb-2"><a href="recipes.html"><i class="bi bi-chevron-right"></i> Tarifler</a></li>
+            <li class="mb-2"><a href="nutrition.html"><i class="bi bi-chevron-right"></i> Beslenme</a></li>
+            <li class="mb-2"><a href="appointment.html"><i class="bi bi-chevron-right"></i> Randevu</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4">
+          <h5 class="mb-3">İletişim</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><i class="bi bi-geo-alt me-2"></i> İstanbul, Türkiye</li>
+            <li class="mb-2"><i class="bi bi-telephone me-2"></i> +90 (212) 000 00 00</li>
+            <li class="mb-2"><i class="bi bi-envelope me-2"></i> info@diyetisyen.com</li>
+            <li class="mb-2"><i class="bi bi-clock me-2"></i> Pzt - Cum: 09:00 - 18:00</li>
+          </ul>
+          <div class="mt-3">
+            <a href="#" class="me-3"><i class="bi bi-instagram" style="font-size:1.25rem;"></i></a>
+            <a href="#" class="me-3"><i class="bi bi-facebook" style="font-size:1.25rem;"></i></a>
+            <a href="#" class="me-3"><i class="bi bi-twitter-x" style="font-size:1.25rem;"></i></a>
+            <a href="#"><i class="bi bi-youtube" style="font-size:1.25rem;"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr style="border-color:rgba(255,255,255,.15); margin-top:2rem;">
+      <div class="text-center" style="opacity:.6; font-size:.9rem;">
+        <p class="mb-0">&copy; 2026 Diyetisyen. Tüm hakları saklıdır.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ===== HERO SLIDER ===== */
+    var heroSlides = [];
+    var heroIndex = 0;
+    var heroTimer = null;
+
+    function renderHeroSlide(index) {
+      if (!heroSlides.length) return;
+      var slide = heroSlides[index];
+      var bg = el('heroBg');
+      var title = el('heroTitle');
+      var desc = el('heroDesc');
+
+      bg.style.opacity = '0';
+      setTimeout(function () {
+        bg.style.backgroundImage = 'url(' + imgUrl(slide.imageUrl) + ')';
+        bg.style.opacity = '0.25';
+      }, 300);
+
+      if (slide.title) title.textContent = slide.title;
+      if (slide.description) desc.textContent = slide.description;
+
+      var dots = document.querySelectorAll('.hero-dot');
+      dots.forEach(function (d, i) {
+        d.classList.toggle('active', i === index);
+      });
+    }
+
+    function nextHeroSlide() {
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      renderHeroSlide(heroIndex);
+    }
+
+    function startHeroTimer() {
+      if (heroTimer) clearInterval(heroTimer);
+      heroTimer = setInterval(nextHeroSlide, 5000);
+    }
+
+    function loadHeroSlides() {
+      api('/HeroSlide').then(function (data) {
+        heroSlides = data || [];
+        if (!heroSlides.length) return;
+
+        var dotsHtml = '';
+        heroSlides.forEach(function (s, i) {
+          dotsHtml += '<button class="hero-dot' + (i === 0 ? ' active' : '') + '" onclick="goToSlide(' + i + ')"></button>';
+        });
+        el('heroDots').innerHTML = dotsHtml;
+
+        renderHeroSlide(0);
+        startHeroTimer();
+      }).catch(function () {
+        // Keep default hero content on error
+      });
+    }
+
+    function goToSlide(i) {
+      heroIndex = i;
+      renderHeroSlide(i);
+      startHeroTimer();
+    }
+
+    /* ===== BMI CALCULATOR ===== */
+    function calculateBMI() {
+      var height = parseFloat(el('bmiHeight').value);
+      var weight = parseFloat(el('bmiWeight').value);
+
+      if (!height || !weight || height <= 0 || weight <= 0) {
+        alert('Lütfen geçerli boy ve kilo değerleri girin.');
+        return;
+      }
+
+      var heightM = height / 100;
+      var bmi = weight / (heightM * heightM);
+      var bmiRound = bmi.toFixed(1);
+
+      var category = '';
+      var icon = '';
+      if (bmi < 18.5) {
+        category = 'Zayıf';
+        icon = '<i class="bi bi-exclamation-triangle me-2"></i>';
+      } else if (bmi < 25) {
+        category = 'Normal';
+        icon = '<i class="bi bi-check-circle me-2"></i>';
+      } else if (bmi < 30) {
+        category = 'Fazla Kilolu';
+        icon = '<i class="bi bi-exclamation-circle me-2"></i>';
+      } else {
+        category = 'Obez';
+        icon = '<i class="bi bi-exclamation-triangle me-2"></i>';
+      }
+
+      el('bmiValue').textContent = bmiRound;
+      el('bmiCategory').innerHTML = icon + category;
+      el('bmiResult').style.display = 'block';
+      el('bmiPlaceholder').style.display = 'none';
+    }
+
+    /* ===== LATEST BLOG POSTS ===== */
+    function loadLatestBlogs() {
+      api('/BlogPost/Latest/3').then(function (data) {
+        var html = '';
+        (data || []).forEach(function (post) {
+          html += '<div class="col-md-4 fade-up">'
+            + '<div class="card-modern">'
+            + '<img src="' + imgUrl(post.imageUrl) + '" onerror="imgError(this)" alt="' + (post.title || '') + '">'
+            + '<div class="card-body">'
+            + (post.categoryName ? '<span class="badge-custom mb-2 d-inline-block">' + post.categoryName + '</span>' : '')
+            + '<h5 class="card-title">' + (post.title || '') + '</h5>'
+            + '<p class="card-text">' + truncate(post.content || post.summary || '', 100) + '</p>'
+            + '<small class="text-muted"><i class="bi bi-calendar3 me-1"></i>' + formatDate(post.createdAt) + '</small>'
+            + '</div></div></div>';
+        });
+        if (html) el('latestBlogs').innerHTML = html;
+        initAnimations();
+      }).catch(function () {});
+    }
+
+    /* ===== LATEST GALLERY ===== */
+    function loadLatestGallery() {
+      api('/GalleryImage/Latest/3').then(function (data) {
+        var html = '';
+        (data || []).forEach(function (item) {
+          html += '<div class="col-md-4 fade-up">'
+            + '<div class="card-modern">'
+            + '<img src="' + imgUrl(item.imageUrl) + '" onerror="imgError(this)" alt="' + (item.title || '') + '">'
+            + '<div class="card-body">'
+            + '<h5 class="card-title">' + (item.title || '') + '</h5>'
+            + (item.description ? '<p class="card-text">' + truncate(item.description, 100) + '</p>' : '')
+            + '</div></div></div>';
+        });
+        if (html) el('latestGallery').innerHTML = html;
+        initAnimations();
+      }).catch(function () {});
+    }
+
+    /* ===== LATEST RECIPES ===== */
+    function loadLatestRecipes() {
+      api('/Recipe/Latest/3').then(function (data) {
+        var html = '';
+        (data || []).forEach(function (recipe) {
+          html += '<div class="col-md-4 fade-up">'
+            + '<div class="card-modern">'
+            + '<img src="' + imgUrl(recipe.imageUrl) + '" onerror="imgError(this)" alt="' + (recipe.title || '') + '">'
+            + '<div class="card-body">'
+            + (recipe.categoryName ? '<span class="badge-custom mb-2 d-inline-block">' + recipe.categoryName + '</span>' : '')
+            + '<h5 class="card-title">' + (recipe.title || '') + '</h5>'
+            + '<p class="card-text">' + truncate(recipe.description || recipe.summary || '', 100) + '</p>'
+            + (recipe.prepTime ? '<small class="text-muted"><i class="bi bi-clock me-1"></i>' + recipe.prepTime + ' dk</small>' : '')
+            + '</div></div></div>';
+        });
+        if (html) el('latestRecipes').innerHTML = html;
+        initAnimations();
+      }).catch(function () {});
+    }
+
+    /* ===== APPOINTMENT FORM ===== */
+    function submitAppointment(e) {
+      e.preventDefault();
+      var btn = el('apptSubmitBtn');
+      var alertBox = el('apptAlert');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gönderiliyor...';
+      alertBox.style.display = 'none';
+
+      var payload = {
+        fullName: el('apptName').value.trim(),
+        phone: el('apptPhone').value.trim(),
+        email: el('apptEmail').value.trim(),
+        appointmentPreference: el('apptPreference').value,
+        goal: el('apptGoal').value,
+        message: el('apptMessage').value.trim()
+      };
+
+      api('/AppointmentRequest', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }).then(function () {
+        alertBox.className = 'alert alert-success mb-3';
+        alertBox.innerHTML = '<i class="bi bi-check-circle me-2"></i>Randevu talebiniz başarıyla gönderildi! En kısa sürede size dönüş yapacağız.';
+        alertBox.style.display = 'block';
+        el('appointmentForm').reset();
+      }).catch(function () {
+        alertBox.className = 'alert alert-danger mb-3';
+        alertBox.innerHTML = '<i class="bi bi-x-circle me-2"></i>Bir hata oluştu. Lütfen tekrar deneyin.';
+        alertBox.style.display = 'block';
+      }).finally(function () {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send"></i> Randevu Talebi Gönder';
+      });
+    }
+
+    /* ===== INIT ===== */
+    document.addEventListener('DOMContentLoaded', function () {
+      loadHeroSlides();
+      loadLatestBlogs();
+      loadLatestGallery();
+      loadLatestRecipes();
+    });
+  </script>
+
+</body>
+</html>

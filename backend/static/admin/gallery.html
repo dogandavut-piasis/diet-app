@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="tr" ng-app="dietitianApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Galeri Yönetimi</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            margin-top: 20px;
+        }
+        .gallery-card {
+            transition: transform 0.2s;
+        }
+        .gallery-card:hover {
+            transform: translateY(-5px);
+        }
+        .preview-image {
+            max-height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body ng-controller="GalleryAdminController as admin">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand text-dark" href="index.html">
+                <i class="bi bi-shield-lock-fill me-2"></i>Admin Panel - Galeri Yönetimi
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="index.html">
+                            <i class="bi bi-images me-1"></i>Hero Slider
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="nutrition.html">
+                            <i class="bi bi-card-list me-1"></i>Beslenme Programları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="blog.html">
+                            <i class="bi bi-journal-text me-1"></i>Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active text-dark" href="gallery.html">
+                            <i class="bi bi-images me-1"></i>Galeri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="recipes.html">
+                            <i class="bi bi-journal-richtext me-1"></i>Lezzetli Tarifler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="appointments.html">
+                            <i class="bi bi-calendar-check me-1"></i>Randevu Talepleri
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="../pages/index.html">
+                            <i class="bi bi-house me-1"></i>Ana Sayfaya Dön
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-3">
+                    <i class="bi bi-images me-2"></i>Galeri Yönetimi
+                </h2>
+            </div>
+        </div>
+
+        <!-- Add New Image Button -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Resim Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Gallery Images List -->
+        <div class="row" ng-if="admin.images.length > 0">
+            <div class="col-md-6 col-lg-4 mb-4" ng-repeat="image in admin.images track by image.id">
+                <div class="card gallery-card h-100">
+                    <img ng-src="{{image.imageUrl || 'https://via.placeholder.com/400x200?text=Resim+Yok'}}" 
+                         class="card-img-top preview-image" 
+                         alt="{{image.title}}"
+                         onerror="this.src='https://via.placeholder.com/400x200?text=Resim+Yuklenemedi'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{image.title}}</h5>
+                        <p class="card-text text-muted small" ng-if="image.description">{{image.description | limitTo: 100}}{{image.description.length > 100 ? '...' : ''}}</p>
+                        <div class="mb-2">
+                            <span class="badge bg-secondary me-1">Sıra: {{image.order}}</span>
+                            <span class="badge" ng-class="image.isActive ? 'bg-success' : 'bg-danger'">
+                                {{image.isActive ? 'Aktif' : 'Pasif'}}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <button class="btn btn-sm btn-warning me-2" ng-click="admin.editImage(image)">
+                            <i class="bi bi-pencil"></i> Düzenle
+                        </button>
+                        <button class="btn btn-sm btn-danger" ng-click="admin.deleteImage(image.id)">
+                            <i class="bi bi-trash"></i> Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="row" ng-if="admin.images.length === 0 && !admin.loading">
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-images" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Henüz galeri resmi eklenmemiş.</p>
+                <button class="btn btn-primary" ng-click="admin.showAddModal()">
+                    İlk Resmi Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="row" ng-if="admin.loading">
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="galleryModalLabel">
+                        {{admin.editingImage ? 'Galeri Resmi Düzenle' : 'Yeni Galeri Resmi Ekle'}}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form ng-submit="admin.saveImage($event)">
+                        <div class="mb-3">
+                            <label for="galleryTitle" class="form-label">Başlık *</label>
+                            <input type="text" class="form-control" id="galleryTitle" ng-model="admin.currentImage.title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="galleryDescription" class="form-label">Açıklama</label>
+                            <textarea class="form-control" id="galleryDescription" rows="3" ng-model="admin.currentImage.description"></textarea>
+                            <small class="form-text text-muted">İsteğe bağlı açıklama</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="galleryImageFile" class="form-label">Resim *</label>
+                            <input type="file" class="form-control" id="galleryImageFile" accept="image/*" 
+                                   ng-model="admin.imageFile" onchange="angular.element(this).scope().admin.onFileSelected(this)">
+                            <small class="form-text text-muted">Resim dosyası seçin (JPG, PNG, GIF - Max 5MB)</small>
+                            <div ng-if="admin.currentImage.imageUrl" class="mt-2">
+                                <img ng-src="{{admin.currentImage.imageUrl}}" alt="Önizleme" 
+                                     style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd;" 
+                                     onerror="this.src='https://via.placeholder.com/200x150?text=Resim+Yuklenemedi'">
+                                <div class="mt-2">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           ng-model="admin.currentImage.imageUrl" 
+                                           placeholder="Veya manuel URL girin">
+                                </div>
+                            </div>
+                            <div ng-if="admin.uploading" class="mt-2">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <span class="ms-2">Yükleniyor...</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="galleryOrder" class="form-label">Sıra *</label>
+                                <input type="number" class="form-control" id="galleryOrder" ng-model="admin.currentImage.order" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Durum</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="galleryIsActive" ng-model="admin.currentImage.isActive">
+                                    <label class="form-check-label" for="galleryIsActive">
+                                        Aktif
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin JS -->
+    <script>
+        var app = angular.module('dietitianApp', []);
+        app.controller('GalleryAdminController', function($scope, $http) {
+            var vm = this;
+            var apiBaseUrl = '/api';
+            
+            vm.images = [];
+            vm.loading = false;
+            vm.editingImage = false;
+            vm.currentImage = {};
+            vm.imageFile = null;
+            vm.uploading = false;
+            var galleryModal;
+            
+            // Helper function to normalize image URL
+            vm.normalizeImageUrl = function(url) {
+                if (!url) return url;
+                if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+                    return url;
+                }
+                return '/' + url;
+            };
+            
+            // Load all gallery images
+            vm.loadImages = function() {
+                vm.loading = true;
+                $http.get(apiBaseUrl + '/GalleryImage/All')
+                    .then(function(response) {
+                        vm.images = response.data.map(function(image) {
+                            if (image.imageUrl) {
+                                image.imageUrl = vm.normalizeImageUrl(image.imageUrl);
+                            }
+                            return image;
+                        });
+                        vm.loading = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading gallery images:', error);
+                        alert('Galeri resimleri yüklenirken hata oluştu!');
+                        vm.loading = false;
+                    });
+            };
+            
+            // Initialize modal
+            vm.initModal = function() {
+                var modalElement = document.getElementById('galleryModal');
+                if (modalElement && !galleryModal) {
+                    galleryModal = new bootstrap.Modal(modalElement);
+                }
+            };
+            
+            // File selected handler
+            vm.onFileSelected = function(input) {
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    vm.uploadImage(file);
+                }
+            };
+            
+            // Upload image
+            vm.uploadImage = function(file) {
+                vm.uploading = true;
+                var formData = new FormData();
+                formData.append('file', file);
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', apiBaseUrl + '/FileUpload/upload-image', true);
+                
+                xhr.onload = function() {
+                    vm.uploading = false;
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        vm.currentImage.imageUrl = response.imageUrl;
+                        $scope.$apply();
+                    } else {
+                        var error = JSON.parse(xhr.responseText);
+                        var errorMsg = error && error.message ? error.message : 'Resim yüklenirken hata oluştu!';
+                        alert('Hata: ' + errorMsg);
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    vm.uploading = false;
+                    $scope.$apply();
+                    alert('Resim yüklenirken bir hata oluştu!');
+                };
+                
+                xhr.send(formData);
+            };
+            
+            // Show add modal
+            vm.showAddModal = function() {
+                vm.editingImage = false;
+                vm.currentImage = {
+                    title: '',
+                    description: '',
+                    imageUrl: '',
+                    order: vm.images.length,
+                    isActive: true
+                };
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('galleryImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (galleryModal) {
+                    galleryModal.show();
+                }
+            };
+            
+            // Edit image
+            vm.editImage = function(image) {
+                vm.editingImage = true;
+                vm.currentImage = angular.copy(image);
+                vm.imageFile = null;
+                vm.uploading = false;
+                var fileInput = document.getElementById('galleryImageFile');
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                vm.initModal();
+                if (galleryModal) {
+                    galleryModal.show();
+                }
+            };
+            
+            // Save image
+            vm.saveImage = function($event) {
+                if ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                }
+                
+                if (!vm.currentImage.title || !vm.currentImage.imageUrl) {
+                    alert('Lütfen başlık ve resim alanlarını doldurun!');
+                    return false;
+                }
+                
+                if (vm.editingImage) {
+                    $http.put(apiBaseUrl + '/GalleryImage/' + vm.currentImage.id, vm.currentImage)
+                        .then(function(response) {
+                            if (galleryModal) {
+                                galleryModal.hide();
+                            }
+                            vm.loadImages();
+                            alert('Galeri resmi başarıyla güncellendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error updating gallery image:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Galeri resmi güncellenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                } else {
+                    $http.post(apiBaseUrl + '/GalleryImage', vm.currentImage)
+                        .then(function(response) {
+                            if (galleryModal) {
+                                galleryModal.hide();
+                            }
+                            vm.loadImages();
+                            alert('Galeri resmi başarıyla eklendi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error creating gallery image:', error);
+                            var errorMsg = error.data && error.data.message ? error.data.message : 'Galeri resmi eklenirken hata oluştu!';
+                            alert('Hata: ' + errorMsg);
+                        });
+                }
+                return false;
+            };
+            
+            // Delete image
+            vm.deleteImage = function(id) {
+                if (confirm('Bu galeri resmini silmek istediğinize emin misiniz?')) {
+                    $http.delete(apiBaseUrl + '/GalleryImage/' + id)
+                        .then(function(response) {
+                            vm.loadImages();
+                            alert('Galeri resmi başarıyla silindi!');
+                        })
+                        .catch(function(error) {
+                            console.error('Error deleting gallery image:', error);
+                            alert('Galeri resmi silinirken hata oluştu!');
+                        });
+                }
+            };
+            
+            // Initialize
+            vm.init = function() {
+                vm.loadImages();
+                setTimeout(function() {
+                    vm.initModal();
+                }, 100);
+            };
+            
+            vm.init();
+        });
+    </script>
+</body>
+</html>

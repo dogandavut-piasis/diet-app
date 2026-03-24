@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Yönetimi - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+  <script src="../js/config.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/app.js"></script>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-header">
+                <h4 class="mb-0 fw-bold">Admin Panel</h4>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html"><i class="bi bi-images me-2"></i>Hero Slider</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="nutrition.html"><i class="bi bi-heart-pulse me-2"></i>Beslenme</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="blog.html"><i class="bi bi-journal-richtext me-2"></i>Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="gallery.html"><i class="bi bi-card-image me-2"></i>Galeri</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="recipes.html"><i class="bi bi-egg-fried me-2"></i>Tarifler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="appointments.html"><i class="bi bi-calendar-check me-2"></i>Randevular</a>
+                </li>
+                <li><hr class="dropdown-divider mx-3"></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../pages/index.html"><i class="bi bi-house me-2"></i>Ana Sayfa</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="#" onclick="adminLogout()"><i class="bi bi-box-arrow-right me-2"></i>Çıkış</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Galeri Yönetimi</h2>
+                    <p class="text-muted mb-0">Galeri görsellerini yönetin</p>
+                </div>
+                <button class="btn btn-primary-custom" onclick="openAddModal()">
+                    <i class="bi bi-plus-lg me-2"></i>Yeni Görsel Ekle
+                </button>
+            </div>
+
+            <div id="galleryList" class="row g-4 mt-2">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Yükleniyor...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Yeni Görsel Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="galleryForm">
+                        <input type="hidden" id="galleryId">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Başlık</label>
+                                <input type="text" class="form-control" id="galleryTitle" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Açıklama</label>
+                                <textarea class="form-control" id="galleryDescription" rows="3"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Görsel</label>
+                                <input type="file" class="form-control" id="galleryImage" accept="image/*">
+                                <div id="currentImage" class="mt-2 d-none">
+                                    <small class="text-muted">Mevcut görsel:</small>
+                                    <img id="currentImagePreview" src="" class="d-block mt-1 rounded" style="max-height: 100px;" onerror="imgError(this)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Sıra</label>
+                                <input type="number" class="form-control" id="galleryOrder" value="0">
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="galleryIsActive" checked>
+                                    <label class="form-check-label fw-medium" for="galleryIsActive">Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary-custom" onclick="saveGallery()">
+                        <i class="bi bi-check-lg me-1"></i>Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let galleryModal;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            galleryModal = new bootstrap.Modal(document.getElementById('galleryModal'));
+            loadGallery();
+        });
+
+        async function loadGallery() {
+            try {
+                const images = await api('/GalleryImage/All');
+                const container = document.getElementById('galleryList');
+
+                if (!images || images.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-card-image" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="mt-2 text-muted">Henüz görsel eklenmemiş</p>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = images.map(img => `
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card-modern h-100">
+                            <div class="position-relative">
+                                <img src="${imgUrl(img.imageUrl || img.imagePath)}"
+                                     class="card-img-top"
+                                     style="height: 180px; object-fit: cover;"
+                                     alt="${img.title}"
+                                     onerror="imgError(this)">
+                                <span class="badge ${img.isActive ? 'bg-success' : 'bg-secondary'} position-absolute top-0 end-0 m-2">
+                                    ${img.isActive ? 'Aktif' : 'Pasif'}
+                                </span>
+                                <span class="badge bg-dark position-absolute top-0 start-0 m-2">
+                                    Sıra: ${img.order ?? 0}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold">${img.title}</h6>
+                                <p class="card-text text-muted small mb-0">${img.description || ''}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3 px-3">
+                                <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editGallery(${img.id})">
+                                    <i class="bi bi-pencil me-1"></i>Düzenle
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteGallery(${img.id})">
+                                    <i class="bi bi-trash me-1"></i>Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('galleryList').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Veriler yüklenirken hata oluştu.</div>
+                    </div>`;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Yeni Görsel Ekle';
+            document.getElementById('galleryForm').reset();
+            document.getElementById('galleryId').value = '';
+            document.getElementById('galleryIsActive').checked = true;
+            document.getElementById('currentImage').classList.add('d-none');
+            galleryModal.show();
+        }
+
+        async function editGallery(id) {
+            try {
+                const img = await api('/GalleryImage/' + id);
+                document.getElementById('modalTitle').textContent = 'Görsel Düzenle';
+                document.getElementById('galleryId').value = img.id;
+                document.getElementById('galleryTitle').value = img.title || '';
+                document.getElementById('galleryDescription').value = img.description || '';
+                document.getElementById('galleryOrder').value = img.order ?? 0;
+                document.getElementById('galleryIsActive').checked = img.isActive;
+                document.getElementById('galleryImage').value = '';
+
+                if (img.imageUrl || img.imagePath) {
+                    document.getElementById('currentImage').classList.remove('d-none');
+                    document.getElementById('currentImagePreview').src = imgUrl(img.imageUrl || img.imagePath);
+                } else {
+                    document.getElementById('currentImage').classList.add('d-none');
+                }
+
+                galleryModal.show();
+            } catch (error) {
+                alert('Görsel bilgileri yüklenirken hata oluştu.');
+            }
+        }
+
+        async function saveGallery() {
+            const id = document.getElementById('galleryId').value;
+
+            var imageUrlValue = '';
+            const imageFile = document.getElementById('galleryImage').files[0];
+            if (imageFile) {
+                var result = await apiUpload(imageFile);
+                imageUrlValue = result.imageUrl;
+            }
+
+            var data = {
+                title: document.getElementById('galleryTitle').value,
+                description: document.getElementById('galleryDescription').value,
+                order: parseInt(document.getElementById('galleryOrder').value) || 0,
+                isActive: document.getElementById('galleryIsActive').checked
+            };
+
+            if (imageUrlValue) {
+                data.imageUrl = imageUrlValue;
+            } else if (id) {
+                var currentSrc = document.getElementById('currentImagePreview').src;
+                if (currentSrc) {
+                    data.imageUrl = currentSrc.replace(imgUrl(''), '');
+                }
+            }
+
+            try {
+                if (id) {
+                    data.id = parseInt(id);
+                    await api('/GalleryImage/' + id, { method: 'PUT', body: JSON.stringify(data) });
+                } else {
+                    await api('/GalleryImage', { method: 'POST', body: JSON.stringify(data) });
+                }
+                galleryModal.hide();
+                loadGallery();
+            } catch (error) {
+                alert('Kaydetme sırasında hata oluştu: ' + (error.message || error));
+            }
+        }
+
+        async function deleteGallery(id) {
+            if (!confirm('Bu görseli silmek istediğinizden emin misiniz?')) return;
+            try {
+                await api('/GalleryImage/' + id, { method: 'DELETE' });
+                loadGallery();
+            } catch (error) {
+                alert('Silme sırasında hata oluştu.');
+            }
+        }
+    </script>
+</body>
+</html>
