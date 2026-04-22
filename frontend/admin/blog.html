@@ -209,6 +209,7 @@
             document.getElementById('blogId').value = '';
             document.getElementById('blogIsPublished').checked = true;
             document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('blogPublishedDate').value = now.toISOString().slice(0, 16);
@@ -238,6 +239,7 @@
                     document.getElementById('currentImagePreview').src = imgUrl(post.imageUrl || post.imagePath);
                 } else {
                     document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
                 }
 
                 blogModal.show();

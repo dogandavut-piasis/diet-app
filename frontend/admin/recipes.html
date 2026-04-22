@@ -242,6 +242,7 @@
             document.getElementById('recipeId').value = '';
             document.getElementById('recipeIsActive').checked = true;
             document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
             recipeModal.show();
         }
 
@@ -268,6 +269,7 @@
                     document.getElementById('currentImagePreview').src = imgUrl(r.imageUrl || r.imagePath);
                 } else {
                     document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
                 }
 
                 recipeModal.show();

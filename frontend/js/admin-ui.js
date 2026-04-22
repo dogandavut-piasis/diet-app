@@ -102,11 +102,41 @@
     btn.classList.add('admin-action-btn');
   }
 
+  function initImagePreview() {
+    var preview = document.getElementById('currentImagePreview');
+    var container = document.getElementById('currentImage');
+    if (!preview || !container) return;
+    var label = container.querySelector('small');
+    var defaultLabel = label ? label.textContent : 'Mevcut görsel:';
+
+    document.querySelectorAll('input[type="file"][accept*="image"]').forEach(function (inp) {
+      inp.addEventListener('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          preview.src = ev.target.result;
+          container.classList.remove('d-none');
+          if (label) label.textContent = 'Seçilen görsel (önizleme):';
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    var modal = document.querySelector('.modal');
+    if (modal) {
+      modal.addEventListener('hidden.bs.modal', function () {
+        if (label) label.textContent = defaultLabel;
+      });
+    }
+  }
+
   function init() {
     initSidebar();
     initBottomNav();
     initHeaderCompact();
     initFabScroll();
+    initImagePreview();
   }
 
   if (document.readyState === 'loading') {

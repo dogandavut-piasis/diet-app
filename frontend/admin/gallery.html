@@ -195,6 +195,7 @@
             document.getElementById('galleryId').value = '';
             document.getElementById('galleryIsActive').checked = true;
             document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
             galleryModal.show();
         }
 
@@ -214,6 +215,7 @@
                     document.getElementById('currentImagePreview').src = imgUrl(img.imageUrl || img.imagePath);
                 } else {
                     document.getElementById('currentImage').classList.add('d-none');
+            document.getElementById('currentImagePreview').src = '';
                 }
 
                 galleryModal.show();
