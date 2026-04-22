@@ -383,14 +383,71 @@ body {
 }
 .login-card h2 { font-weight: 700; color: var(--primary-dark); }
 
+/* ===== ADMIN BOTTOM NAV (mobil) ===== */
+.admin-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-white);
+  border-top: 1px solid var(--border);
+  z-index: 1020;
+  box-shadow: 0 -2px 14px rgba(0,0,0,.08);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.admin-bottom-nav .nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .15rem;
+  padding: .5rem .2rem .4rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: .65rem;
+  font-weight: 500;
+  line-height: 1;
+  transition: color .2s, background .2s;
+  min-width: 0;
+}
+.admin-bottom-nav .nav-item i {
+  font-size: 1.35rem;
+  transition: transform .2s;
+}
+.admin-bottom-nav .nav-item.active {
+  color: var(--primary);
+}
+.admin-bottom-nav .nav-item.active i {
+  transform: scale(1.1);
+}
+.admin-bottom-nav .nav-item:active {
+  background: rgba(45,106,79,.08);
+}
+.admin-bottom-nav .nav-item span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 991px) {
   .admin-sidebar { transform: translateX(-100%); }
   .admin-sidebar.open { transform: translateX(0); box-shadow: 0 0 30px rgba(0,0,0,.3); }
-  .admin-main { margin-left: 0; padding: 1rem; }
-  .admin-header { padding: 1rem 1.25rem; flex-wrap: wrap; gap: .5rem; }
+  .admin-main { margin-left: 0; padding: 1rem 1rem 5.5rem; }
+  .admin-header { padding: 1rem 1.25rem; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .admin-header h2 { font-size: 1.15rem; margin-bottom: 0 !important; }
+  .admin-header p { display: none; }
+  .admin-header .btn-primary-custom {
+    padding: .5rem .9rem;
+    font-size: .9rem;
+    white-space: nowrap;
+  }
   .sidebar-toggle-btn { display: inline-flex; }
   body.sidebar-open { overflow: hidden; }
+  .admin-bottom-nav { display: flex; }
 }
 @media (max-width: 768px) {
   .hero-content h1 { font-size: 2rem; }

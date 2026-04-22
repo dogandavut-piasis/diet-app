@@ -1,4 +1,19 @@
 (function () {
+  var ADMIN_NAV = [
+    { href: 'index.html',        icon: 'house-heart',       label: 'Slider' },
+    { href: 'nutrition.html',    icon: 'heart-pulse',       label: 'Beslenme' },
+    { href: 'blog.html',         icon: 'journal-richtext',  label: 'Blog' },
+    { href: 'gallery.html',      icon: 'card-image',        label: 'Galeri' },
+    { href: 'recipes.html',      icon: 'egg-fried',         label: 'Tarifler' },
+    { href: 'appointments.html', icon: 'calendar-check',    label: 'Randevu' }
+  ];
+
+  function currentPage() {
+    var p = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    if (!p.endsWith('.html')) p = 'index.html';
+    return p;
+  }
+
   function initSidebar() {
     var sidebar = document.querySelector('.admin-sidebar');
     if (!sidebar) return;
@@ -56,9 +71,47 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSidebar);
-  } else {
+  function initBottomNav() {
+    if (document.querySelector('.admin-bottom-nav')) return;
+    if (!document.querySelector('.admin-sidebar')) return;
+
+    var page = currentPage();
+    var nav = document.createElement('nav');
+    nav.className = 'admin-bottom-nav';
+    nav.setAttribute('aria-label', 'Admin mobil navigasyon');
+    nav.innerHTML = ADMIN_NAV.map(function (item) {
+      var active = item.href.toLowerCase() === page ? ' active' : '';
+      return '<a href="' + item.href + '" class="nav-item' + active + '">' +
+             '<i class="bi bi-' + item.icon + '"></i>' +
+             '<span>' + item.label + '</span>' +
+             '</a>';
+    }).join('');
+    document.body.appendChild(nav);
+  }
+
+  function initHeaderCompact() {
+    var header = document.querySelector('.admin-header');
+    if (!header) return;
+    var title = header.querySelector('h2');
+    if (title) title.classList.add('admin-title');
+  }
+
+  function initFabScroll() {
+    var btn = document.querySelector('.admin-header .btn-primary-custom');
+    if (!btn) return;
+    btn.classList.add('admin-action-btn');
+  }
+
+  function init() {
     initSidebar();
+    initBottomNav();
+    initHeaderCompact();
+    initFabScroll();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
